@@ -1,0 +1,215 @@
+<%@ plsql procedure="ebb_users_list" %>
+<%@ plsql parameter="p_logon"        type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_last_name"    type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_first_name"   type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_active"       type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_admin"        type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_rows"        type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_page_no"     type="NUMBER"   default="1"%>
+<%!
+   /*
+   ========================================================================
+   *
+   * Copyright (c) 2014-2015 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+   */
+
+   /* Modification History
+   Date       By    History
+   ---------  ----  -------------------------------------------------------
+   03-MAY-15  BD    New
+   */
+
+   --DECLARATION SECTION
+   l_style_path                 VARCHAR2(100) := ebb_lib.StylePath;
+   l_image_path                 VARCHAR2(100) := ebb_lib.ImagePath;
+   l_js_path                    VARCHAR2(100) := ebb_lib.JSPath;
+   l_main_css                   VARCHAR2(100) := ebb_lib.MainCSS;
+   l_dhtmlx_path                VARCHAR2(100) := ebb_lib.DHTMLXPath;
+   l_date_format                VARCHAR2(20)  := zsi_lib.DefaultDateFormat || ' HH:MI:SS';
+   l_user                       ebb_users.logon%TYPE;
+   l_user_id                    ebb_users.user_id%TYPE;
+   l_user_valid                 VARCHAR2(1);
+   l_ctr                        NUMBER(10) := 0;
+   l_select                     VARCHAR2(10000);
+   l_where                      VARCHAR2(10000);
+   l_from                       VARCHAR2(512);
+   l_order                      VARCHAR2(512);
+   l_sql                        VARCHAR2(30000);
+   l_criteria                   VARCHAR2(32000);
+   users_cur                    SYS_REFCURSOR;
+   l_url                        VARCHAR2(32000);
+
+   l_rows                       NUMBER(10);
+   l_max_rows                   NUMBER(10) := zsi_lib.MaxRowsInList;
+   l_row_count                  NUMBER(10) := 0;
+   l_dhtmlx_sort                VARCHAR2(1024);
+
+   l_user_user_id               ebb_users.user_id%TYPE;
+   l_logon                      ebb_users.logon%TYPE;
+   l_last_name                  ebb_users.last_name%TYPE;
+   l_first_name                 ebb_users.first_name%TYPE;
+   l_admin                      ebb_users.admin%TYPE;
+   l_active                     ebb_users.active%TYPE;
+   l_rn                         NUMBER;
+%>
+<%
+   l_user    := ebb_sessions_lib.GetCookieUser;
+   --l_user_id := ebb_lib.GetUserId(l_user);
+   ebb_header(p_dgrid=>'Y', p_dwin=>'Y',p_jqbs=>'Y');
+%>
+<body>
+<%
+   l_select := 'SELECT user_id, logon, last_name, first_name, admin, active ';
+   l_from   := ' FROM ebb_users ';
+   l_where  := ' WHERE UPPER(logon)<>''ADMIN'' ';
+   l_order  := ' ORDER BY logon ';
+
+   IF p_logon IS NOT NULL THEN
+      l_where    := l_where || ' AND logon = ''' || LOWER(p_logon) || '''';
+      l_criteria := l_criteria || ' | ' || '<b>Logon : </b>' || LOWER(p_logon) || '';
+      l_url := l_url || '&p_logon=' || p_logon;
+   END IF;
+
+   IF p_last_name IS NOT NULL THEN
+      l_where    := l_where || ' AND last_name LIKE ''%' || UPPER(p_last_name) || '%''';
+      l_criteria := l_criteria || ' | ' || '<b>Last Name : </b>' || UPPER(p_last_name) || '';
+      l_url := l_url || '&p_last_name=' || p_last_name;
+   END IF;
+
+   IF p_first_name IS NOT NULL THEN
+      l_where    := l_where || ' AND first_name LIKE ''%' || UPPER(p_first_name) || '%''';
+      l_criteria := l_criteria || ' | ' || '<b>First Name : </b>' || UPPER(p_first_name) || '';
+      l_url := l_url || '&p_first_name=' || p_first_name;
+   END IF;
+
+   IF p_active IS NOT NULL THEN
+      l_where    := l_where || ' AND active = ''' || UPPER(p_active) || '''';
+      l_criteria := l_criteria || ' | ' || '<b>Active : </b>' || UPPER(p_active) || '';
+      l_url := l_url || '&p_active=' || p_active;
+   END IF;
+
+   IF p_admin IS NOT NULL THEN
+      l_where    := l_where || ' AND admin = ''' || UPPER(p_admin) || '''';
+      l_criteria := l_criteria || ' | ' || '<b>Admin : </b>' || UPPER(p_admin) || '';
+      l_url := l_url || '&p_admin=' || p_admin;
+   END IF;
+
+
+   l_criteria := SUBSTR(l_criteria,4);
+   IF l_url IS NOT NULL THEN
+      l_url := SUBSTR(l_url,2) || '&';
+   END IF;
+   l_url := 'ebb_users_list?' || l_url;
+
+
+   IF p_page_no = 1 AND p_rows IS NULL THEN
+      l_sql := 'SELECT COUNT(*) ' || l_from || l_where;
+      OPEN users_cur FOR l_sql;
+      LOOP
+         FETCH users_cur INTO l_rows;
+         EXIT WHEN users_cur%NOTFOUND;
+      END LOOP;
+      CLOSE users_cur;
+   ELSE
+      l_rows := p_rows;
+   END IF;
+   l_url := l_url ||'&p_rows=' || l_rows;
+
+   l_sql := l_select ||', row_number() OVER (ORDER BY logon) rn ' || l_from || l_where;
+   --l_sql := l_select || l_from || l_where || l_order;
+%>
+<table class="dhtmlxGrid" gridWidth="99.5%" gridHeight="500px" id="gridbox1">
+   <tr>
+      <th width="100px" align="left">Logon</th>
+      <th width="200px" align="left">Name</th>
+      <th width="50px"  align="center">Active</th>
+      <th width="50px"  align="center">Admin</th>
+   </tr>
+<%
+      OPEN users_cur FOR l_sql;
+      LOOP
+         FETCH users_cur INTO l_user_user_id, l_logon, l_last_name, l_first_name, l_admin, l_active, l_rn;
+         EXIT WHEN users_cur%NOTFOUND;
+         l_row_count := l_row_count + 1;
+%>
+      <tr valign="top" bgcolor="#FFFFFF">
+         <td><a href="javascript:void(0)" onclick="editUserInfo(<%= l_user_user_id %>)"><%= l_logon %></a></td>
+         <td><%= l_last_name || ', ' || l_first_name %></td>
+         <td align="center"><%= l_active %></td>
+         <td align="center"><%= l_admin %></td>
+      </tr>
+<%
+      END LOOP;
+      CLOSE users_cur;
+%>
+</table>
+
+<div class="bottomNav">
+   <div class="buttonGroup">
+<%
+         zsi_bs_lib.Button('btnSearch','Search',p_data_toggle =>'modal',p_data_target =>'#modalWindow');
+         zsi_bs_lib.Button('btnAdd','Add',p_onclick =>'parent.attachURL(''ebb_jobs_form?p_job_id='',''Add Job'', 900, 550)');
+         zsi_bs_lib.Button('btnDelete','Delete',p_onclick =>'return checkDelete(''ebb_jobs_delete?p_del_jobs='');');
+%>
+   </div>
+<%
+zsi_lib.ShowPaging(p_page_no,l_rows,l_row_count);
+%>
+</div>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+      $('.modal-dialog').css('width', '450px');
+   });
+
+   //on window resize
+   $(window).resize(function(){
+       zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+   });
+
+  function checkDelete(l_cmd) {
+    var l_stmt, l_count
+      l_stmt = zsi.table.getCheckBoxesValues("input[name=p_cb]:checked","p_del_jobs=","&");
+
+    if (l_stmt!="") {
+        if(confirm("Are you sure you want to delete ALL SELECTED Jobs?")) {
+          $.post( l_cmd + "&" + l_stmt, function(d){
+               window.location.reload();
+          }).fail(function(d) {
+                     alert("Sorry, the curent transaction is not successfull.");
+               });
+
+        }
+     }
+   }
+
+   function gotoPage(p_this){
+       var url = "<%= l_url %>&p_page_no=" + p_this.value;
+       window.location.href = url;
+    };
+
+   var mygrid = dhtmlXGridFromTable("gridbox1");
+   mygrid.setSkin("light");
+   mygrid.setImagePath("<%= l_dhtmlx_path %>dhtmlxGrid/codebase/imgs/");
+   mygrid.setEditable(false);
+   mygrid.lockRow(0, true);
+   mygrid.enableLightMouseNavigation(true);
+   mygrid.setColSorting("<%= l_dhtmlx_sort %>");
+   zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+
+   function editUserInfo(user_id) {
+      var url = "ebb_user_detail?p_user_id=" + user_id;
+      winPopup(url,"Manage User Information",700,500);
+   }
+
+   parent.dhxLayout.cells("b").setText("Users List");
+</script>
+
+<script type="text/javascript" src="<%= l_js_path %>bootstrap.min.js"></script>
+</body>
+</html>

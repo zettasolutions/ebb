@@ -1,0 +1,152 @@
+<%@ plsql procedure="ebb_job_ws_list" %>
+<%@ plsql parameter="p_job_id"     type="NUMBER" default="NULL"%>
+<%@ plsql parameter="p_rows"        type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_page_no"     type="NUMBER"   default="1"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   08-NOV-14  GT    New.
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path                VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_js_path                    VARCHAR2(100) := zsi_lib.JSPath;
+   l_style_path                 VARCHAR2(128) := zsi_lib.StylePath;
+   l_date_format                VARCHAR2(20):= zsi_lib.DefaultDateFormat;
+   l_select                     VARCHAR2(3000);
+   l_from                       VARCHAR2(1000);
+   l_where                      VARCHAR2(4000);
+   l_sql                        VARCHAR2(8000);
+   TYPE job_cur IS REF CURSOR;
+   jobref          job_cur;
+   l_ws_id                      ebb_job_ws_v.ws_id%TYPE;
+   l_ws_name                    ebb_job_ws_v.ws_name%TYPE;
+   l_ws_url                     ebb_job_ws_v.ws_url%TYPE;
+   l_ws_response                 ebb_job_ws_v.ws_response%TYPE;
+   l_row_no                     NUMBER(10);
+   l_rows                       NUMBER(10);
+   l_max_rows                   NUMBER(10) := zsi_lib.MaxRowsInList;
+   l_url                        VARCHAR2(32000) := 'ebb_job_ws_list';
+   l_row_count                  NUMBER(10) := 0;
+   l_dhtmlx_sort                VARCHAR2(1024);
+   l_module_id                  s004_modules.module_id%TYPE := zsi_lib.GetModuleID(owa_util.get_procedure);
+%>
+<%
+   ebb_pageheader(p_dgrid=>'Y', p_dwin=>'Y');
+%>
+<%
+
+   l_select := 'SELECT ws_id,
+                       ws_name,
+                       ws_response,
+                       ws_url ';
+                       
+   l_from   := '  FROM ebb_job_ws_v ';
+   l_where  := ' WHERE 1=1';
+
+   IF p_job_id IS NOT NULL THEN
+      l_where := l_where ||' and job_id=' || p_job_id;
+   END IF;
+   l_url := l_url ||'&p_job_id=' || p_job_id;
+
+   
+   IF p_page_no = 1 AND p_rows IS NULL THEN
+      l_sql := 'SELECT COUNT(*) ' || l_from || l_where;
+      
+      OPEN jobref FOR l_sql;
+      LOOP
+         FETCH jobref INTO l_rows;
+         EXIT WHEN jobref%NOTFOUND;
+      END LOOP;
+      CLOSE jobref;
+   ELSE
+      l_rows := p_rows;
+   END IF;
+   
+ 
+   l_url := l_url ||'&p_rows=' || l_rows;
+
+   l_sql := l_select ||', row_number() OVER (ORDER BY ws_id) rn ' || l_from || l_where;
+
+   l_sql := 'SELECT * FROM ( ' || l_sql || ') ' || zsi_lib.GeneratePagingWhere(p_page_no);
+
+
+
+%>
+<body>
+
+<table class="dhtmlxGrid" gridWidth="99.5%" gridHeight="500px" id="gridbox1">
+   <tr valign="bottom">
+      <th nowrap align="left" width="50px">WS ID</th>
+      <th nowrap align="left" width="100px">WS Name</th>
+      <th nowrap align="right" width="300px">Response</th>
+      <th nowrap align="right" width="300px">URL</th>
+   </tr>
+<%
+   l_dhtmlx_sort := 'str,str,str';
+
+   OPEN jobref FOR l_sql;
+   LOOP
+      FETCH jobref INTO l_ws_id,
+                        l_ws_name,
+                        l_ws_response,
+                        l_ws_url,
+                        l_row_no;
+      EXIT WHEN jobref%NOTFOUND;
+      l_row_count := l_row_count + 1;
+%>
+   <tr valign="bottom">
+      <td nowrap align="center">
+         <a href="javascript:void(0)" TITLE="Click here to View Workstation Groups" onClick="parent.attachURL('ebb_ws_groups_form?p_ws_id=<%= l_ws_id %>','View Workstation Groups', 650, 500)"><%=l_ws_id %></a>
+      </td>
+      <td nowrap align="left"><%=l_ws_name %></td>
+      <td nowrap align="left"><%=l_ws_response %></td>
+      <td nowrap align="left"><%=l_ws_url %></td>
+   </tr>
+<%
+   END LOOP;
+%>
+</table>
+<% zsi_lib.ShowPaging(p_page_no,l_rows,l_row_count); %>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+      $('.modal-dialog').css('width', '450px');
+   });
+
+   //on window resize
+   $(window).resize(function(){
+       zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+   });
+
+   function gotoPage(p_this){
+       var url = "<%= l_url %>&p_page_no=" + p_this.value;
+       window.location.href = url;
+    };
+
+   var mygrid = dhtmlXGridFromTable("gridbox1");
+   mygrid.setSkin("light");
+   mygrid.setImagePath("<%= l_dhtmlx_path %>dhtmlxGrid/codebase/imgs/");
+   mygrid.setEditable(false);
+   mygrid.lockRow(0, true);
+   mygrid.enableLightMouseNavigation(true);
+   mygrid.setColSorting("<%= l_dhtmlx_sort %>");
+   zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+
+</script>
+
+<script type="text/javascript" src="<%= l_js_path %>bootstrap.min.js"></script>
+</body>
+</html>

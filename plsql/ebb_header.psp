@@ -1,0 +1,140 @@
+<%@ plsql procedure="ebb_header" %>
+<%@ plsql parameter="p_dlayout"  type="VARCHAR2" default="'N'"%>
+<%@ plsql parameter="p_dgrid"    type="VARCHAR2" default="'N'"%>
+<%@ plsql parameter="p_dwin"     type="VARCHAR2" default="'N'"%>
+<%@ plsql parameter="p_jqbs"     type="VARCHAR2" default="'Y'"%>
+<%!
+   /*
+   =======================================================================
+   *
+   * Copyright (c) 2014-2015 ZettaSolutions,Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+   */
+
+   /* Modification History
+   Date       By    History
+   ---------  ----  ------------------------------------------------------------------------
+   03-MAY-15  BD    Copied from pageheader.
+   */
+   l_style_path     VARCHAR2(128) := ebb_lib.StylePath;
+   l_dhtmlx_path    VARCHAR2(128) := ebb_lib.DHTMLXPath;
+   l_js_path        VARCHAR2(128) := ebb_lib.JSPath;
+   l_user           VARCHAR2(100);
+%>
+<%
+   l_user := ebb_sessions_lib.GetCookieUser;
+   IF l_user IS NULL THEN
+      ebb_sessions_lib.RedirectURL('errorpage');
+      RETURN;
+   END IF;
+%>
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<META HTTP-EQUIV="PRAGMA" CONTENT="NO-CACHE">
+<META HTTP-EQUIV="EXPIRES" CONTENT="<%= TO_CHAR(SYSDATE,'Dy, DD Mon YYYY HH:MI:SS') %>">
+<META CHARSET="UTF-8">
+<META NAME="VIEWPORT" CONTENT="WIDTH=DEVICE-WIDTH, INITIAL-SCALE=1">
+<title>eBulletin (<%= l_user %>)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<%
+   IF UPPER(p_jqbs) = 'Y' THEN
+%>
+<script type="text/javascript" src="<%= l_js_path %>jquery-1.11.1.min.js"></script>
+<%
+   END IF;
+
+   IF UPPER(p_dlayout) = 'Y' THEN
+%>
+<link rel="stylesheet" type="text/css" href="<%= l_dhtmlx_path %>dhtmlxLayout/codebase/dhtmlxlayout.css">
+<link rel="stylesheet" type="text/css" href="<%= l_dhtmlx_path %>dhtmlxLayout/codebase/skins/dhtmlxlayout_dhx_skyblue.css">
+<%
+   END IF;
+
+   IF UPPER(p_dgrid) = 'Y' THEN
+%>
+<link rel="stylesheet" type="text/css" href="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/dhtmlxgrid.css">
+<link rel="stylesheet" type="text/css" href="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/skins/dhtmlxgrid_dhx_skyblue.css">
+<style>
+    div.gridbox_light table.obj tr.rowselected td.cellselected, div.gridbox table.obj td.cellselected {
+        background-color:#ACCADD;
+    }
+</style>
+<%
+   END IF;
+
+   IF UPPER(p_dwin) = 'Y' THEN
+%>
+<link rel="stylesheet" type="text/css" href="<%= l_dhtmlx_path %>dhtmlxWindows/codebase/dhtmlxwindows.css">
+<link rel="stylesheet" type="text/css" href="<%= l_dhtmlx_path %>dhtmlxWindows/codebase/skins/dhtmlxwindows_dhx_skyblue.css">
+<%
+   END IF;
+%>
+<%
+   IF UPPER(p_jqbs) = 'Y' THEN
+%>
+<link rel="stylesheet" type="text/css" href="bootstrap_css">
+<link rel="stylesheet" type="text/css" href="<%= l_style_path %>bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="<%= l_style_path %>datepicker.css">
+<%
+   END IF;
+%>
+<link rel="stylesheet" type="text/css" href="zsi_style_css">
+<%
+   IF UPPER(p_dgrid) = 'Y' AND UPPER(p_dwin) = 'N' AND UPPER(p_dlayout) = 'N' THEN
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/dhtmlxcommon.js"></script>
+<%
+   ELSIF UPPER(p_dgrid) = 'N' AND UPPER(p_dwin) = 'Y' AND UPPER(p_dlayout) = 'N' THEN
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxLayout/codebase/dhtmlxcommon.js"></script>
+<%
+   ELSIF UPPER(p_dgrid) = 'N' AND UPPER(p_dwin) = 'N' AND UPPER(p_dlayout) = 'Y' THEN
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxWindows/codebase/dhtmlxcommon.js"></script>
+<%
+   ELSE
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/dhtmlxcommon.js"></script>
+<%
+   END IF;
+%>
+<%
+   IF UPPER(p_dlayout) = 'Y' THEN
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxLayout/codebase/dhtmlxlayout.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxLayout/codebase/dhtmlxcontainer.js"></script>
+<%
+   END IF;
+
+   IF UPPER(p_dgrid) = 'Y' THEN
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/dhtmlxgrid.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/dhtmlxgridcell.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/ext/dhtmlxgrid_start.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/ext/dhtmlxgrid_srnd.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxGrid/codebase/ext/dhtmlxgrid_filter.js"></script>
+<%
+   END IF;
+
+   IF UPPER(p_dwin) = 'Y' THEN
+%>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxWindows/codebase/dhtmlxwindows.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxWindows/codebase/dhtmlxcontainer.js"></script>
+<%
+   END IF;
+%>
+<%
+   IF UPPER(p_jqbs) = 'Y' THEN
+%>
+<script type="text/javascript" src="<%= l_js_path %>bootstrap-datepicker.js"></script>
+<%
+   END IF;
+%>
+<script type="text/javascript" src="zsi_lib_js"></script>
+
+</head>

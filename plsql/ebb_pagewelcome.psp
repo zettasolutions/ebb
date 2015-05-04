@@ -1,0 +1,37 @@
+<%@ plsql procedure="ebb_pagewelcome" %>
+<%!
+   /*
+   =======================================================================
+   *
+   * Copyright (c) 2014 ZettaSolutions,Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+   */
+
+   /* Modification History
+   Date       By    History
+   ---------  ----  ------------------------------------------------------------------------
+   Jun-25-14  BD    Used s004_lib for the paths.
+   Jun-22-14  GF    New
+   */
+   l_image_path     VARCHAR2(128) := ebb_lib.ImagePath;
+%>
+<%
+  ebb_pageheader;
+%>
+<body>
+<style>
+body{
+   background-color:#0279cf;
+} </style>
+<div class="">
+   <div style="margin:100px 300px">
+   <img src="<%= l_image_path %>ebb_screen.png" alt="" />
+   </div>
+
+</div>
+</body
+</html>

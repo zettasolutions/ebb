@@ -1,0 +1,20 @@
+ CREATE OR REPLACE VIEW "EBB_JOBS_V"
+   ( "JOB_ID"
+   , "JOB_DATE"
+   , "JOB_DESC"
+   , "FILENAME"
+   , "JOB_SEQ"
+   , "DOC_FILENAME"
+   , "THUMB_FILENAME"
+   , "JOB_GROUPS_COUNT")
+   AS SELECT
+    job_id
+   ,job_date
+   ,job_desc
+   ,filename
+   ,job_seq
+   ,doc_filename
+   ,thumb_filename
+   ,zsi_lib.GetCount('*','ebb_job_groups',' job_id=' ||  job_id ) as job_groups_count
+  FROM ebb_jobs
+/

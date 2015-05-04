@@ -1,0 +1,153 @@
+<%@ plsql procedure="ebb_jobs_update" %>
+<%@ plsql parameter="p_job_id"          type="VARCHAR2"%>
+<%@ plsql parameter="p_job_date"        type="VARCHAR2"%>
+<%@ plsql parameter="p_job_desc"        type="VARCHAR2"%>
+<%@ plsql parameter="p_job_seq"         type="VARCHAR2"%>
+<%@ plsql parameter="p_action"          type="VARCHAR2"%>
+<%@ plsql parameter="p_doc_filename"    type="VARCHAR2"%>
+<%@ plsql parameter="p_thumb_filename"  type="VARCHAR2"%>
+<%@ plsql parameter="p_old_doc"         type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_old_thumb"       type="VARCHAR2" default="NULL"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014-2015 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   03-MAY-15  BD    Added parameters: p_old_doc, p_old_thumb, p_doc_filename, p_thumb_filename
+                    Removed p_filename and the grouping logic and related items.
+   08-NOV-14  GT    New
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path                VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_js_path                    VARCHAR2(100) := zsi_lib.JSPath;
+   l_date_format                VARCHAR2(30) := zsi_lib.DefaultDateFormat;
+   l_sql                        VARCHAR2(1000);
+   l_changed                    VARCHAR2(1) := 'N';
+   l_seq                        NUMBER;
+   l_job_date                   DATE;
+   l_rec                        EBB_JOBS%ROWTYPE;
+   l_del_doc                    BOOLEAN := FALSE;
+   l_del_thumb                  BOOLEAN := FALSE;
+
+%>
+<%
+BEGIN
+%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Insert/Update job Groups </title>
+</head>
+<body>
+<%
+   l_seq := p_job_id;
+   l_job_date := TO_DATE(p_job_date,l_date_format);
+
+   IF p_job_id IS NULL  AND p_job_date IS NOT NULL  AND p_doc_filename IS NOT NULL AND p_thumb_filename IS NOT NULL THEN
+      SELECT ebb_jobs_SQ001.NEXTVAL INTO l_seq FROM DUAL;
+      INSERT INTO ebb_jobs (
+          job_id
+         ,job_date
+         ,job_desc
+         ,job_seq
+         ,action
+         ,doc_filename
+         ,thumb_filename
+      )
+      VALUES
+      (   l_seq
+         ,l_job_date
+         ,p_job_desc
+         ,p_job_seq
+         ,p_action
+         ,p_doc_filename
+         ,p_thumb_filename
+   );
+   ELSIF p_job_id IS NOT NULL AND p_job_date IS NOT NULL  AND p_doc_filename IS NOT NULL AND p_thumb_filename IS NOT NULL THEN
+
+      SELECT * INTO l_rec FROM ebb_jobs WHERE job_id=p_job_id;
+
+      IF zsi_lib.IsChanged(l_rec.job_date, l_job_date) = 'Y' THEN
+         l_changed :='Y';
+      l_rec.job_date := l_job_date;
+      END IF;
+
+      IF zsi_lib.IsChanged(l_rec.job_seq, TO_NUMBER(p_job_seq)) = 'Y' THEN
+         l_changed :='Y';
+      l_rec.job_seq := p_job_seq;
+      END IF;
+
+
+      IF zsi_lib.IsChanged(l_rec.job_desc, p_job_desc) = 'Y' THEN
+         l_changed :='Y';
+      l_rec.job_desc := p_job_desc;
+      END IF;
+
+      IF zsi_lib.IsChanged(p_old_doc, p_doc_filename) = 'Y' THEN
+         l_changed :='Y';
+         l_rec.doc_filename := p_doc_filename;
+         l_del_doc := TRUE;
+      END IF;
+
+      IF zsi_lib.IsChanged(p_old_thumb, p_thumb_filename) = 'Y' THEN
+         l_changed :='Y';
+         l_rec.thumb_filename := p_thumb_filename;
+         l_del_thumb := TRUE;
+      END IF;
+
+      IF l_changed = 'Y' THEN
+         UPDATE ebb_jobs SET row = l_rec WHERE job_id=p_job_id;
+
+         IF l_del_doc THEN
+            DELETE FROM ebb_docs WHERE name = p_old_doc;
+         END IF;
+         IF l_del_thumb THEN
+            DELETE FROM ebb_docs WHERE name = p_old_thumb;
+         END IF;
+
+         COMMIT;
+      END IF;
+
+   END IF;
+
+/*
+   FOR i IN 2..p_job_group_id.COUNT LOOP
+
+      IF p_job_group_id(i) IS NULL  AND l_seq IS NOT NULL and p_group_id(i) IS NOT NULL THEN
+
+         INSERT INTO ebb_job_groups
+         (   job_group_id
+            ,group_id
+            ,job_id
+         )
+         VALUES
+         (   EBB_JOB_GROUPS_SQ001.NEXTVAL
+            ,p_group_id(i)
+            ,l_seq
+         );
+
+       ELSIF p_job_group_id(i) IS NOT NULL AND p_group_id(i) IS NULL  THEN
+
+            DELETE FROM ebb_job_groups where job_group_id=p_job_group_id(i);
+
+       END IF;
+   END LOOP;
+*/
+END;
+%>
+
+<script type="text/javascript">
+    parent.location.reload();
+    parent.w1.close();
+</script>

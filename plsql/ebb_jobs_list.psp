@@ -1,0 +1,203 @@
+<%@ plsql procedure="ebb_jobs_list" %>
+<%@ plsql parameter="p_job_desc"     type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_rows"        type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_page_no"     type="NUMBER"   default="1"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   03-MAY-15  BD    Added doc_filename and thumb_filename
+   08-NOV-14  GT    New.
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path                VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_js_path                    VARCHAR2(100) := zsi_lib.JSPath;
+   l_style_path                 VARCHAR2(128) := zsi_lib.StylePath;
+   l_date_format                VARCHAR2(20):= zsi_lib.DefaultDateFormat;
+   l_select                     VARCHAR2(3000);
+   l_from                       VARCHAR2(1000);
+   l_where                      VARCHAR2(4000);
+   l_sql                        VARCHAR2(8000);
+   TYPE job_cur IS REF CURSOR;
+   jobref          job_cur;
+   l_job_id                     ebb_jobs.job_id%TYPE;
+   l_job_desc                   ebb_jobs.job_desc%TYPE;
+   l_job_date                   ebb_jobs.job_date%TYPE;
+   l_job_seq                    ebb_jobs.job_seq%TYPE;
+   l_doc_filename               ebb_jobs.doc_filename%TYPE;
+   l_thumb_filename             ebb_jobs.thumb_filename%TYPE;
+   l_job_groups_count           NUMBER;
+   l_row_no                     NUMBER(10);
+   l_rows                       NUMBER(10);
+   l_max_rows                   NUMBER(10) := zsi_lib.MaxRowsInList;
+   l_url                        VARCHAR2(32000) := 'ebb_jobs_list';
+   l_row_count                  NUMBER(10) := 0;
+   l_dhtmlx_sort                VARCHAR2(1024);
+   l_module_id                  s004_modules.module_id%TYPE := zsi_lib.GetModuleID(owa_util.get_procedure);
+%>
+<%
+   ebb_header(p_dgrid=>'Y', p_dwin=>'Y');
+%>
+<%
+
+   l_select := 'SELECT job_id,
+                       job_desc,
+                       job_date,
+                       job_seq,
+                       doc_filename,
+                       thumb_filename,
+                       job_groups_count ';
+   l_from   := '  FROM ebb_jobs_v ';
+   l_where  := ' WHERE 1=1';
+
+
+
+   IF p_job_desc IS NOT NULL THEN
+      l_where := l_where ||' AND UPPER(job_desc) LIKE '|| '''' || '%' ||  UPPER(p_job_desc) || '%' || '''' || ' ';
+   END IF;
+   l_url := l_url ||'&p_job_desc=' || p_job_desc;
+
+
+   IF p_page_no = 1 AND p_rows IS NULL THEN
+      l_sql := 'SELECT COUNT(*) ' || l_from || l_where;
+      OPEN jobref FOR l_sql;
+      LOOP
+         FETCH jobref INTO l_rows;
+         EXIT WHEN jobref%NOTFOUND;
+      END LOOP;
+      CLOSE jobref;
+   ELSE
+      l_rows := p_rows;
+   END IF;
+   l_url := l_url ||'&p_rows=' || l_rows;
+
+   l_sql := l_select ||', row_number() OVER (ORDER BY job_id) rn ' || l_from || l_where;
+
+   l_sql := 'SELECT * FROM ( ' || l_sql || ') ' || zsi_lib.GeneratePagingWhere(p_page_no);
+
+
+
+
+%>
+<body>
+ <%
+   zsi_bs_lib.openModalWindow('modalWindow','Search Jobs','job_search_frm','ebb_jobs_list');
+   zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Description',p_inputName=>'p_job_desc', p_labelSize =>3, p_inputSize =>9);
+   zsi_bs_lib.CloseFormGroup();
+   zsi_bs_lib.closeModalWindow('submit','Search');
+%>
+
+<table class="dhtmlxGrid" gridWidth="99.5%" gridHeight="500px" id="gridbox1">
+   <tr valign="bottom">
+      <th nowrap align="center" width="50px">Id#</th>
+      <th nowrap align="center" width="100px">Date</th>
+      <th nowrap align="left" width="250px">Description</th>
+      <th nowrap align="right" width="200px">Document<br>Filename</th>
+      <th nowrap align="right" width="200px">Thumbnail<br>Filename</th>
+      <th nowrap align="right" width="100px">Seq#</th>
+      <th nowrap align="right" width="100px">#Group Recipients</th>
+      <th align="center" width="60px">Delete</th>
+   </tr>
+<%
+   l_dhtmlx_sort := 'int,str,str,str,int,na';
+
+   OPEN jobref FOR l_sql;
+   LOOP
+      FETCH jobref INTO l_job_id,
+                        l_job_desc,
+                        l_job_date,
+                        l_job_seq,
+                        l_doc_filename,
+                        l_thumb_filename,
+                        l_job_groups_count,
+                        l_row_no;
+      EXIT WHEN jobref%NOTFOUND;
+      l_row_count := l_row_count + 1;
+%>
+   <tr valign="bottom">
+      <td nowrap align="center">
+         <a href="javascript:void(0)" TITLE="Click here to Edit Job" onClick="parent.attachURL('ebb_jobs_form?p_job_id=<%= l_job_id %>','Edit Job &raquo <%=l_job_id %>', 900, 550)"><%=l_job_id %></a>
+      </td>
+      <td nowrap align="center"><%= TO_CHAR(l_job_date,l_date_format) %></td>
+      <td nowrap align="left"><%=l_job_desc %></td>
+      <td nowrap align="left"><a href="javascript:void(0)" TITLE="Click here to View Document" onClick="parent.attachURL('ebb_job_doc_download?p_job_id=<%= l_job_id %>&p_type=D','View Document for Job &raquo <%=l_job_id %>', 900, 550)"><%= zsi_lib.GetBaseName(l_doc_filename) %></a></td>
+      <td nowrap align="left"><a href="javascript:void(0)" TITLE="Click here to View Thumbnail" onClick="parent.attachURL('ebb_job_doc_download?p_job_id=<%= l_job_id %>&p_type=T','View Thumbnail for Job &raquo <%=l_job_id %>', 900, 550)"><%= zsi_lib.GetBaseName(l_thumb_filename) %></a></td>
+      <td nowrap align="center"><%=l_job_seq %></td>
+      <td nowrap align="center"><a href="javascript:void(0)" TITLE="Click here to View WS Responses" onClick="parent.attachURL('ebb_job_ws_list?p_job_id=<%= l_job_id %>','View Job &raquo <%=l_job_id %>', 900, 550)"><%=l_job_groups_count %></a></td>
+      <td><input type="checkbox" name="p_cb" onclick="zsi.table.setCheckBox(this,<%= l_job_id %>);">
+                         <input type="hidden" name="p_del_jobs" value=""></td>
+   </tr>
+<%
+   END LOOP;
+%>
+</table>
+
+<div class="bottomNav">
+   <div class="buttonGroup">
+   <%
+            zsi_bs_lib.Button('btnSearch','Search',p_data_toggle =>'modal',p_data_target =>'#modalWindow');
+            zsi_bs_lib.Button('btnAdd','Add',p_onclick =>'parent.attachURL(''ebb_jobs_form?p_job_id='',''Add Job'', 900, 550)');
+            zsi_bs_lib.Button('btnDelete','Delete',p_onclick =>'return checkDelete(''ebb_jobs_delete?p_del_jobs='');');
+   %>
+   </div>
+<% zsi_lib.ShowPaging(p_page_no,l_rows,l_row_count); %>
+</div>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+      $('.modal-dialog').css('width', '450px');
+   });
+
+   //on window resize
+   $(window).resize(function(){
+       zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+   });
+
+  function checkDelete(l_cmd) {
+    var l_stmt, l_count
+      l_stmt = zsi.table.getCheckBoxesValues("input[name=p_cb]:checked","p_del_jobs=","&");
+
+    if (l_stmt!="") {
+        if(confirm("Are you sure you want to delete ALL SELECTED Jobs?")) {
+          $.post( l_cmd + "&" + l_stmt, function(d){
+               window.location.reload();
+          }).fail(function(d) {
+                     alert("Sorry, the curent transaction is not successfull.");
+               });
+
+        }
+     }
+   }
+
+   function gotoPage(p_this){
+       var url = "<%= l_url %>&p_page_no=" + p_this.value;
+       window.location.href = url;
+    };
+
+   var mygrid = dhtmlXGridFromTable("gridbox1");
+   mygrid.setSkin("light");
+   mygrid.setImagePath("<%= l_dhtmlx_path %>dhtmlxGrid/codebase/imgs/");
+   mygrid.setEditable(false);
+   mygrid.lockRow(0, true);
+   mygrid.enableLightMouseNavigation(true);
+   mygrid.setColSorting("<%= l_dhtmlx_sort %>");
+   zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+
+</script>
+
+<script type="text/javascript" src="<%= l_js_path %>bootstrap.min.js"></script>
+</body>
+</html>

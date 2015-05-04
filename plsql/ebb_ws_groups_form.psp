@@ -1,0 +1,122 @@
+<%@ plsql procedure="ebb_ws_groups_form" %>
+<%@ plsql parameter="p_ws_id" type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_user_name" type="VARCHAR2" default="NULL"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   08-NOV-14  GT    New.
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path    VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_style_path     VARCHAR2(128) := zsi_lib.StylePath;
+   l_js_path        VARCHAR2(128) := zsi_lib.JSPath;
+   l_title          VARCHAR2(50);
+   l_frmOffset      VARCHAR2(50):='';
+   l_user_iswrite   NUMBER(1):=0;
+   l_dhtmlx_sort    VARCHAR2(1024);
+   l_dhtmlx_filter  VARCHAR2(1024);
+
+
+   CURSOR um_cur IS
+      SELECT *
+        FROM ebb_workstation_groups_v
+       WHERE ws_id=p_ws_id
+       ORDER BY group_name asc;
+
+  CURSOR mod_cur IS
+      SELECT *
+        FROM ebb_groups
+       WHERE group_id NOT IN (SELECT group_id FROM ebb_workstation_groups_v WHERE ws_id = p_ws_id)
+       ORDER BY group_name asc;
+
+%>
+<%
+   ebb_pageheader(p_dgrid=>'Y', p_dwin=>'Y');
+%>
+<body >
+<form name="frmDSList" action="ebb_ws_groups_update" method="POST" >
+<%
+--   l_user_iswrite := zsi_lib.IsWrite(zsi_sessions_lib.GetCookieUser,p_module_id);
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_ws_id', p_inputValue=>p_ws_id);
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_ws_group_id');
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_group_id');
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_cb');
+
+   l_dhtmlx_sort := 'na,str,na';
+   l_dhtmlx_filter := '&nbsp;,#text_filter, &nbsp;';
+%>
+<table class="dhtmlxGrid" gridWidth="99.5%" gridHeight="410px" id="gridbox1">
+   <tr>
+      <th nowrap align="left" width="30px">&nbsp;</th>
+      <th nowrap align="left" width="490px">Group Name</th>
+   </tr>
+<%
+   FOR i IN um_cur LOOP
+%>
+   <tr valign="bottom">
+
+      <td align="center">
+          <input type="hidden" name="p_group_id" value="<%= i.group_id %>">
+          <input type="checkbox" CHECKED name="p_cb" onclick="zsi.table.setCheckBox(this,<%= i.group_id %>);"></td>
+      <td><input type="hidden" name="p_ws_group_id" value="<%= i.ws_group_id %>"><%= i.group_name %></td>
+   </tr>
+<%
+   END LOOP;
+
+
+   FOR i IN mod_cur LOOP
+%>
+   <tr valign="bottom">
+
+      <td align="center">
+          <input type="hidden" name="p_group_id" value="">
+          <input type="checkbox" name="p_cb" onclick="zsi.table.setCheckBox(this,<%= i.group_id %>);">
+       </td>
+       <td><input type="hidden" name="p_ws_group_id" value=""><%= i.group_name %></td>
+   </tr>
+<%
+   END LOOP;
+
+
+%>
+</table>
+<div class="buttonGroup <%=l_frmOffset%>">
+
+<%
+--   IF l_user_iswrite = 1 THEN
+      zsi_bs_lib.Button('btnSubmit','Save',p_type =>'submit');
+      zsi_bs_lib.Button('btnReset','Reset',p_type =>'reset');
+--   END IF;
+%>
+</div>
+
+</form>
+<script type='text/javascript'>
+    var mygrid = dhtmlXGridFromTable("gridbox1");
+    mygrid.setSkin("light");
+    mygrid.setImagePath("<%= l_dhtmlx_path %>dhtmlxGrid/codebase/imgs/");
+    mygrid.setEditable(false);
+    mygrid.lockRow(0, true);
+    mygrid.enableLightMouseNavigation(true);
+    mygrid.setColSorting("<%= l_dhtmlx_sort %>");
+    mygrid.attachHeader("<%= l_dhtmlx_filter %>");
+    mygrid.setSizes();
+    zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+
+
+</script>
+</body>
+</html>

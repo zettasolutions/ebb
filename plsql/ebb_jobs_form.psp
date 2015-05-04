@@ -1,0 +1,165 @@
+<%@ plsql procedure="ebb_jobs_form" %>
+<%@ plsql parameter="p_job_id"    type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_user_name" type="VARCHAR2" default="NULL"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   08-NOV-14  GT    New.
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path        VARCHAR2(100) := ebb_lib.DHTMLXPath;
+   l_style_path         VARCHAR2(128) := ebb_lib.StylePath;
+   l_js_path            VARCHAR2(128) := ebb_lib.JSPath;
+   l_date_format        VARCHAR2(20)  := ebb_lib.DefaultDateFormat;
+   l_title              VARCHAR2(50);
+   l_frmOffset          VARCHAR2(50):='';
+   l_user_iswrite       NUMBER(1):=0;
+   l_dhtmlx_sort        VARCHAR2(1024);
+   l_dhtmlx_filter      VARCHAR2(1024);
+   l_rec                ebb_jobs%ROWTYPE;
+   l_job_id             ebb_jobs.job_id%TYPE := '';
+   l_job_date           VARCHAR(20) := TO_CHAR(SYSDATE,l_date_format);
+   l_job_desc           ebb_jobs.job_desc%TYPE := '';
+   l_doc_filename       ebb_jobs.doc_filename%TYPE := '';
+   l_thumb_filename     ebb_jobs.thumb_filename%TYPE := '';
+   l_job_seq            ebb_jobs.job_seq%TYPE := '';
+   l_action             ebb_jobs.action%TYPE:= '';
+   l_user_iswrite       NUMBER(1):=0;
+   l_selected1          VARCHAR2(20);
+   l_selected2          VARCHAR2(20);
+   l_selected3          VARCHAR2(20);
+
+   CURSOR um_cur IS
+      SELECT *
+        FROM ebb_job_groups_v
+       WHERE job_id=p_job_id
+       ORDER BY group_name asc;
+
+  CURSOR mod_cur IS
+      SELECT *
+        FROM ebb_groups
+       WHERE group_id NOT IN (SELECT group_id FROM ebb_job_groups_v WHERE job_id = p_job_id)
+       ORDER BY group_name asc;
+
+%>
+<%
+   IF p_job_id IS NOT NULL THEN
+      SELECT * INTO l_rec FROM ebb_jobs WHERE job_id = p_job_id;
+      l_job_id               :=l_rec.job_id;
+      l_job_date             :=TO_CHAR(l_rec.job_date, l_date_format);
+      l_job_desc             :=l_rec.job_desc;
+      l_doc_filename         :=l_rec.doc_filename;
+      l_thumb_filename       :=l_rec.thumb_filename;
+      l_job_seq              :=l_rec.job_seq;
+      l_action               :=l_rec.action;
+   END IF;
+
+   l_selected1 := '';
+   l_selected2 := '';
+   l_selected3 := '';
+
+   IF l_action = 'ALERT' THEN
+      l_selected1 := 'SELECTED';
+   ELSIF l_action = 'DEBUG' THEN
+      l_selected2 := 'SELECTED';
+   ELSIF l_action = 'CLOSEAPP' THEN
+      l_selected3 := 'SELECTED';
+   END IF;
+
+
+%>
+<%
+   ebb_header(p_dgrid=>'Y', p_dwin=>'Y');
+%>
+<body >
+<form name="frmDSList" action="ebb_jobs_update" method="POST" enctype="multipart/form-data">
+<%
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_job_id', p_inputValue=>p_job_id);
+
+   zsi_bs_lib.OpenEntryForm;
+   zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Job Date',p_inputName=>'p_job_date',p_inputValue=>l_job_date,p_labelSize =>2, p_inputSize =>1, p_attributes=>'style="width: 110px;"');
+   zsi_bs_lib.CloseFormGroup();
+   zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Description',p_inputName=>'p_job_desc',p_inputValue=>l_job_desc, p_labelSize =>2, p_inputSize =>8);
+   zsi_bs_lib.CloseFormGroup();
+
+   IF l_doc_filename IS NOT NULL THEN
+      zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Existing Document',p_inputName=>'p_old_doc',p_inputValue=>zsi_lib.GetBaseName(l_doc_filename), p_labelSize =>2, p_inputSize =>8, p_attributes=>'readonly');
+      zsi_bs_lib.CloseFormGroup();
+   END IF;
+
+   zsi_bs_lib.OpenFormGroup();
+%>
+      <label class="col-xs-2 control-label" for="p_file1_id">New Document</label>
+      <div class="col-xs-8">
+         <div class="input-group col-xs-9">
+            <input type="file" name="p_doc_filename" size="80">
+         </div>
+      </div>
+<%
+   zsi_bs_lib.CloseFormGroup();
+
+   IF l_thumb_filename IS NOT NULL THEN
+      zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Existing Thumbnail',p_inputName=>'p_old_thumb',p_inputValue=>zsi_lib.GetBaseName(l_thumb_filename), p_labelSize =>2, p_inputSize =>8, p_attributes=>'readonly');
+      zsi_bs_lib.CloseFormGroup();
+   END IF;
+
+   zsi_bs_lib.OpenFormGroup();
+%>
+      <label class="col-xs-2 control-label" for="p_file2_id">New Thumbnail</label>
+      <div class="col-xs-8">
+         <div class="input-group col-xs-9">
+            <input type="file" name="p_thumb_filename" size="80">
+         </div>
+      </div>
+<%
+   zsi_bs_lib.CloseFormGroup();
+
+
+   zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Seq#',p_inputName=>'p_job_seq',p_inputValue=>l_job_seq, p_labelSize =>2, p_inputSize =>1);
+   zsi_bs_lib.CloseFormGroup();
+   zsi_bs_lib.OpenFormGroup();
+%> <label class="col-xs-2 control-label">Action </label>
+<div class="col-xs-2">
+          <SELECT name="p_action" value="" class="form-control input-sm">
+            <OPTION value="ALERT" <%= l_selected1 %>>ALERT</OPTION>
+            <OPTION value="DEBUG" <%= l_selected2 %>>DEBUG</OPTION>
+            <OPTION value="CLOSEAPP" <%= l_selected3 %>>CLOSE APP</OPTION>
+
+          </SELECT>
+</div>
+<%
+   zsi_bs_lib.CloseFormGroup();
+   zsi_bs_lib.OpenFormGroup();
+%>
+
+<div class="buttonGroup <%=l_frmOffset%>">
+
+<%
+--   IF l_user_iswrite = 1 THEN
+      zsi_bs_lib.Button('btnSubmit','Save',p_type =>'submit');
+      zsi_bs_lib.Button('btnReset','Reset',p_type =>'reset');
+--   END IF;
+%>
+</div>
+
+</form>
+</body>
+</html>

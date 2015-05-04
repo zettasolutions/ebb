@@ -1,0 +1,86 @@
+<%@ plsql procedure="ebb_groups_update" %>
+<%@ plsql parameter="p_group_id" type="zsi_lib.VC2_255_ARR"%>
+<%@ plsql parameter="p_group_name" type="zsi_lib.VC2_255_ARR"%>
+<%@ plsql parameter="p_group_desc" type="zsi_lib.VC2_255_ARR"%>
+<%@ plsql parameter="p_group_level" type="zsi_lib.VC2_255_ARR"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   07-NOV-14  GT    New
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path                VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_js_path                    VARCHAR2(100) := zsi_lib.JSPath;
+
+
+   l_changed VARCHAR2(1) := 'N';
+   l_rec     ebb_groups%ROWTYPE;
+
+%>
+<%
+BEGIN
+%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Insert/Update EBB Groups </title>
+</head>
+<body>
+<%
+FOR i IN 2..p_group_id.COUNT LOOP
+   IF p_group_id(i) IS NULL  AND p_group_name(i) IS NOT NULL THEN
+      INSERT INTO ebb_groups (
+          group_id
+         ,group_name
+         ,group_desc
+         ,group_level)
+      VALUES
+      (  ebb_groups_SQ001.NEXTVAL
+         ,p_group_name(i)
+         ,p_group_desc(i)
+         ,p_group_level(i)
+      );
+      ELSIF p_group_id(i) IS NOT NULL AND p_group_name(i) IS NOT NULL  THEN
+
+      SELECT * INTO l_rec FROM ebb_groups WHERE group_id=p_group_id(i);
+
+      IF zsi_lib.IsChanged(l_rec.group_name, p_group_name(i)) = 'Y' THEN
+         l_changed :='Y';
+         l_rec.group_name := p_group_name(i);
+      END IF;
+      IF zsi_lib.IsChanged(l_rec.group_desc, p_group_desc(i)) = 'Y' THEN
+         l_changed :='Y';
+         l_rec.group_desc := p_group_desc(i);
+      END IF;
+      IF zsi_lib.IsChanged(l_rec.group_level, TO_NUMBER(p_group_level(i))) = 'Y' THEN
+         l_changed :='Y';
+         l_rec.group_level := p_group_level(i);
+      END IF;
+
+
+      IF l_changed='Y' THEN
+         UPDATE ebb_groups SET row = l_rec WHERE group_id = p_group_id(i);
+      END IF;
+
+      END IF;
+   END LOOP;
+END;
+%>
+
+<script type="text/javascript">
+   parent.location.reload();
+   parent.w1.close();
+</script>

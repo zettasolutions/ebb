@@ -1,0 +1,137 @@
+<%@ plsql procedure="ebb_doc_upload" %>
+<%@ plsql parameter="p_job_id"             type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_file1"                    type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_file2"                    type="VARCHAR2" default="NULL"%>
+<%!
+/*
+========================================================================
+*
+* Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification is strictly prohibited.
+*
+========================================================================
+*/
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   03-MAY-15  BD    New
+*/
+--DECLARATION SECTION
+   l_js_path         VARCHAR2(100) := zsi_lib.JSPath;
+   l_changed         VARCHAR2(1) := 'N';
+   l_create_error    BOOLEAN;
+   l_err_msg         VARCHAR2(32000);
+%>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Pragma"  content="no-cache">
+<meta http-equiv="Expires" content="-1">
+<title>Upload Documents </title>
+</head>
+<body>
+<body>
+<h4 align="center">Document - Upload/Update</h4>
+<br>
+<b class="required">Uploading/Updating Manual. Please wait... </b>
+<br>
+<br>
+<%
+   BEGIN
+
+
+      IF p_file1 IS NULL THEN
+%>
+         <hr size=-1>
+         <p>
+         <b class="error">File is required for Document/File</b>
+         <p>
+         </body>
+         </html>
+<%
+         l_create_error := TRUE;
+      ELSE
+         IF zsi_lib.IsStringValid(p_file1)='N' THEN
+            l_err_msg := 'File cannot contain any of the following characters ' || zsi_lib.void_str2;
+            l_create_error := TRUE;
+%>
+            <b class="error"><%= l_err_msg %></b>
+            <hr size="-1">
+<%
+         END IF;
+      END IF;
+
+      IF p_file2 IS NULL THEN
+%>
+         <hr size=-1>
+         <p>
+         <b class="error">File is required for Thumbnail</b>
+         <p>
+         </body>
+         </html>
+<%
+         l_create_error := TRUE;
+      ELSE
+         IF zsi_lib.IsStringValid(p_file2)='N' THEN
+            l_err_msg := 'File cannot contain any of the following characters ' || zsi_lib.void_str2;
+            l_create_error := TRUE;
+%>
+            <b class="error"><%= l_err_msg %></b>
+            <hr size="-1">
+<%
+         END IF;
+      END IF;
+
+
+      IF l_create_error THEN
+%>
+         <p>
+         <b class="error">Error: Unable to upload the document</b>
+         <p>
+         <hr size=-1>
+         </body>
+         </html>
+<%
+         RETURN;
+      END IF;
+
+      IF p_job_id IS NOT NULL THEN
+
+         INSERT INTO ebb_job_dtl (job_dtl_id,
+                                  job_id,
+                                  doc_name)
+                          VALUES (ebb_job_dtl_seq.NEXTVAL,
+                                  p_job_id,
+                                  p_file1);
+
+         INSERT INTO ebb_job_dtl (job_dtl_id,
+                                  job_id,
+                                  doc_name)
+                          VALUES (ebb_job_dtl_seq.NEXTVAL,
+                                  p_job_id,
+                                  p_file2);
+
+      END IF;
+
+   EXCEPTION
+      WHEN OTHERS THEN
+%>
+              <hr size=-1>
+              <b class="error">Unable to upload and update the document/thumbnail</b>
+              <p>
+              <b class="error"><%= SQLERRM %></b>
+              <p>
+              </body>
+              </html>
+<%
+              ROLLBACK;
+              RETURN;
+
+   END;
+%>
+<script type="text/javascript">
+   parent.HomeWindow.LoadData("");
+   parent.w1.close();
+</script>

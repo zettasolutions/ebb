@@ -1,0 +1,70 @@
+<%@ plsql procedure="ebb_menu" %>
+<%!
+/*
+========================================================================
+*
+* Copyright (c) 2014-2015 ZettaSolution, Inc.  All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification is strictly prohibited.
+*
+========================================================================
+*/
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   03-MAY-15  BD    New
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path                VARCHAR2(100) := ebb_lib.DHTMLXPath;
+%>
+<link rel="stylesheet" type="text/css"  href="<%= l_dhtmlx_path %>dhtmlxAccordion/codebase/skins/dhtmlxaccordion_dhx_skyblue.css">
+<style>
+a         { font-size: 10px; font-family: Verdana, Arial, "Helvetica", Sans-serif; font-weight: normal; color: navy; }
+a:hover   { font-size: 10px; font-family: Verdana, Arial, "Helvetica", Sans-serif; font-weight: normal; color: #333; }
+a:active  { font-size: 10px; font-family: Verdana, Arial, "Helvetica", Sans-serif; font-weight: normal; color: #000; }
+TD, SELECT, TEXTAREA {font-size: 10px; font-family: Verdana, Arial, "Verdana", "Helvetica", Sans-serif; font-weight: normal; color: #000000; }
+</style>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxAccordion/codebase/dhtmlxcommon.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxAccordion/codebase/dhtmlxaccordion.js"></script>
+<script type="text/javascript" src="<%= l_dhtmlx_path %>dhtmlxAccordion/codebase/dhtmlxcontainer.js"></script>
+
+<div id="menuHome" style="display:none">
+<table>
+   <tr>
+      <td>&raquo; <a href="javascript:void(0)" title="Journal" onclick="openLink('ebb_jobs_list','Jobs List');">Jobs</a></td>
+   </tr>
+   <tr>
+      <td>&raquo; <a href="javascript:void(0)"  title="Journal" onclick="openLink('ebb_users_list','Users List');">Users</a></td>
+   </tr>
+</table>
+</div>
+
+
+<script>
+   function doOnLoad() {
+
+      dhxAccord=new dhtmlXAccordion(document.body);
+      dhxAccord.setEffect(true);
+
+      dhxAccord.addItem("iHome", "Menu");
+      dhxAccord.cells("iHome").attachObject("menuHome");
+   }
+
+   function openLink(url,title) {
+      parent.dhxLayout.cells("b").attachURL(url);
+      parent.dhxLayout.cells("b").setText(title);
+   }
+
+   function openSub(menuId) {
+      var subMenu = document.getElementById(menuId);
+      if (subMenu.style.display=="none")
+         subMenu.style.display = "";
+      else
+         subMenu.style.display = "none";
+   }
+</script>
+<body onload="doOnLoad();">
+</body>
+</html>

@@ -1,0 +1,143 @@
+<%@ plsql procedure="ebb_groups_form" %>
+<%@ plsql parameter="p_module_id"   type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_group_id"    type="VARCHAR2" default="NULL"%>
+<%!
+/*
+========================================================================
+*
+* Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification is strictly prohibited.
+*
+========================================================================
+*/
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   07-NOV-14  GT    New
+*/
+--DECLARATION SECTION
+   l_dhtmlx_path           VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_js_path               VARCHAR2(100) := zsi_lib.JSPath;
+   l_style_path            VARCHAR2(128) := zsi_lib.StylePath;
+   l_title                 VARCHAR2(50);
+   l_date_format           VARCHAR(20) := 'MM/DD/YYYY';
+   l_date                  VARCHAR(20) := TO_CHAR(SYSDATE,l_date_format);
+   l_rec                   ebb_groups%ROWTYPE;
+   
+   l_group_id              ebb_groups.group_id%TYPE := '';
+   l_group_name            ebb_groups.group_name%TYPE := '';
+   l_group_desc            ebb_groups.group_desc%TYPE := '';
+   l_group_level           ebb_groups.group_level%TYPE := '';
+   l_user_iswrite          NUMBER(1):=0;
+
+%>
+<%
+--   l_user_iswrite := zsi_lib.IsWrite(zsi_sessions_lib.GetCookieUser,p_module_id);
+   ebb_pageheader(p_dgrid=>'Y', p_dwin=>'Y');
+
+%>
+<body>
+<form name="frmList" action="ebb_groups_update" method="POST" >
+<%
+
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_group_id');
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_group_name');
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_group_desc');
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_group_level');
+
+   IF p_group_id IS NOT NULL THEN
+      SELECT * INTO l_rec FROM ebb_groups WHERE group_id = p_group_id;
+      l_group_id         :=l_rec.group_id;   
+      l_group_name       :=l_rec.group_name; 
+      l_group_desc       :=l_rec.group_desc; 
+      l_group_level      :=l_rec.group_level;
+   
+      zsi_bs_lib.InputHiddenBox(p_inputName=>'p_group_id',p_inputValue=>l_group_id);
+      zsi_bs_lib.OpenEntryForm;
+      zsi_bs_lib.OpenFormGroup();
+         zsi_bs_lib.InputTextBox(p_labelName =>'Group Name',p_inputName=>'p_group_name',p_inputValue=>l_group_name,p_labelSize =>2, p_inputSize =>8);
+      zsi_bs_lib.CloseFormGroup();
+      zsi_bs_lib.OpenFormGroup();
+         zsi_bs_lib.InputTextBox(p_labelName =>'Description',p_inputName=>'p_group_desc',p_inputValue=>l_group_desc, p_labelSize =>2, p_inputSize =>8);
+      zsi_bs_lib.CloseFormGroup();
+      zsi_bs_lib.OpenFormGroup();
+         zsi_bs_lib.InputTextBox(p_labelName =>'Level',p_inputName=>'p_group_level',p_inputValue=>l_group_level, p_labelSize =>2, p_inputSize =>3);
+      zsi_bs_lib.CloseFormGroup();
+      zsi_bs_lib.CloseEntryForm;
+
+
+   ELSE
+%>
+<table class="table">
+   <tr>
+      <th nowrap align="left">Group Name</th>
+      <th nowrap align="left">Description</th>
+      <th nowrap align="center">Level</th>
+   </tr>
+<%
+      FOR i IN 1..5 LOOP
+%>
+   <tr>
+
+      <td><input type="hidden" name="p_group_id" value="">
+         <input type="text" name="p_group_name" value="" class="form-control input-sm">
+      </td>
+      <td><input type="text" name="p_group_desc" value="" class="form-control input-sm"></td>
+      <td><input type="text" name="p_group_level" value="" class="form-control input-sm"></td>
+   </tr>
+<%
+      END LOOP;
+%>
+</table>
+<%
+   END IF;
+%>
+
+<div class="col-xs-12 buttonGroup">
+<%
+--   IF l_user_iswrite = 1 THEN
+      zsi_bs_lib.Offset(2);
+      zsi_bs_lib.Button('btnSubmit','Save',p_type =>'submit');
+      zsi_bs_lib.Button('btnReset','Reset',p_type =>'reset');
+--   END IF;
+%>
+      </div>
+
+</form>
+<script type="text/javascript">
+
+   $("form[name=frmList]").submit(function(){
+      if( zsi.form.checkMandatory()!=true) return false;
+   }); 
+                      
+   //on page loaded
+   $(document).ready(function(){
+      zsi.form.markMandatory({       
+         "groupNames":[ 
+               {"names" :  [  
+                            "p_group_name"
+                           ,"p_group_desc"
+                           ]
+               ,  "type":"M"
+               }             
+         ]      
+         ,"groupTitles":[          
+               {"titles" :  
+                           [                       
+                            "Group Name"
+                           ,"Group Desc"
+                           ]
+               }
+
+         ]
+      });
+   });
+
+</script>
+
+
+</body>
+</html>
+

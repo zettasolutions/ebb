@@ -1,0 +1,105 @@
+CREATE TABLE EBB_SESSIONS (
+SESSION_ID               NUMBER        NOT NULL,
+DT_STAMP                 DATE          NOT NULL,
+LOGON                    VARCHAR2(30)  NOT NULL,
+IP_ADDRESS               VARCHAR2(64)
+)
+TABLESPACE HRIS
+/
+
+ALTER TABLE EBB_SESSIONS
+  ADD CONSTRAINT EBB_SESSIONS_PK PRIMARY KEY
+    (SESSION_ID)
+  USING INDEX
+  TABLESPACE HRIS
+/
+
+CREATE SEQUENCE EBB_SESSIONS_SEQ
+ START WITH     1000
+ INCREMENT BY   1
+ NOCACHE
+ NOCYCLE
+/
+
+
+CREATE TABLE EBB_USERS (
+USER_ID                  NUMBER(10)    NOT NULL,
+LOGON                    VARCHAR2(10)  NOT NULL,
+LAST_NAME                VARCHAR2(30)  NOT NULL,
+FIRST_NAME               VARCHAR2(30)  NOT NULL,
+MIDDLE_INI               VARCHAR2(1),
+PWD                      VARCHAR2(30),
+SESSION_ID               NUMBER(10),
+ADMIN                    VARCHAR2(1)   DEFAULT 'N', /* THE ONLY ONE WHO CAN ADD USER */
+ACTIVE                   VARCHAR2(1)   DEFAULT 'Y',
+CREATED_BY               NUMBER(10),
+CREATED_DATE             DATE,
+UPDATED_BY               NUMBER(10),
+UPDATED_DATE             DATE
+)
+TABLESPACE HRIS
+/
+ALTER TABLE EBB_USERS
+  ADD CONSTRAINT EBB_USERS_PK PRIMARY KEY
+    (USER_ID)
+  USING INDEX
+  TABLESPACE HRIS
+/
+ALTER TABLE EBB_USERS
+  ADD CONSTRAINT EBB_USERS_UK UNIQUE
+    (LOGON)
+  USING INDEX
+  TABLESPACE HRIS
+/
+CREATE SEQUENCE EBB_USERS_SEQ
+ START WITH     1
+ INCREMENT BY   1
+ NOCACHE
+ NOCYCLE
+/
+
+
+
+CREATE TABLE EBB_DOCS (
+NAME                                                  VARCHAR2(128)  UNIQUE NOT NULL,
+MIME_TYPE                                             VARCHAR2(128),
+DOC_SIZE                                              NUMBER,
+DAD_CHARSET                                           VARCHAR2(128),
+LAST_UPDATED                                          DATE,
+CONTENT_TYPE                                          VARCHAR2(128),
+CONTENT                                               LONG RAW,
+BLOB_CONTENT                                          BLOB
+)
+TABLESPACE HRIS
+PCTUSED    0
+PCTFREE    10
+INITRANS   1
+MAXTRANS   255
+STORAGE    (
+            INITIAL          64K
+            NEXT             1M
+            MINEXTENTS       1
+            MAXEXTENTS       UNLIMITED
+            PCTINCREASE      0
+            BUFFER_POOL      DEFAULT
+           )
+LOGGING
+NOCOMPRESS
+NOCACHE
+NOPARALLEL
+MONITORING
+/
+
+
+
+INSERT INTO EBB_USERS (USER_ID, LOGON, PWD, LAST_NAME, FIRST_NAME, ADMIN)
+VALUES (ebb_users_seq.nextval,'BDURANGO',ORA_HASH('ebbAdmin'),'Durango','Bernard','Y')
+/
+INSERT INTO EBB_USERS (USER_ID, LOGON, PWD, LAST_NAME, FIRST_NAME, ADMIN)
+VALUES (ebb_users_seq.nextval,'GTABINAS',ORA_HASH('ebbAdmin'),'Tabinas','Gaudencio','Y')
+/
+INSERT INTO EBB_USERS (USER_ID, LOGON, PWD, LAST_NAME, FIRST_NAME, ADMIN)
+VALUES (ebb_users_seq.nextval,'GFUENTES',ORA_HASH('ebbAdmin'),'Fuentes','German','Y')
+/
+COMMIT
+/

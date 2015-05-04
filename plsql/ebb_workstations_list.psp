@@ -1,0 +1,197 @@
+<%@ plsql procedure="ebb_workstations_list" %>
+<%@ plsql parameter="p_ws_name"     type="VARCHAR2" default="NULL"%>
+<%@ plsql parameter="p_rows"        type="NUMBER"   default="NULL"%>
+<%@ plsql parameter="p_page_no"     type="NUMBER"   default="1"%>
+<%!
+/*
+   ========================================================================
+   *
+   * Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
+   *
+   * Redistribution and use in source and binary forms, with or without
+   * modification is strictly prohibited.
+   *
+   ========================================================================
+*/
+
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   08-NOV-14  GT    New.
+*/
+
+   --DECLARATION SECTION
+   l_dhtmlx_path                VARCHAR2(100) := zsi_lib.DHTMLXPath;
+   l_js_path                    VARCHAR2(100) := zsi_lib.JSPath;
+   l_style_path                 VARCHAR2(128) := zsi_lib.StylePath;
+   l_select                     VARCHAR2(3000);
+   l_from                       VARCHAR2(1000);
+   l_where                      VARCHAR2(4000);
+   l_sql                        VARCHAR2(8000);
+   TYPE ws_cur IS REF CURSOR;
+   wsref          ws_cur;
+   l_ws_id                      ebb_workstations.ws_id%TYPE;
+   l_ws_name                    ebb_workstations.ws_name%TYPE;
+   l_ws_group_count             NUMBER:= 0;
+   l_row_no                     NUMBER(10);
+   l_rows                       NUMBER(10);
+   l_max_rows                   NUMBER(10) := zsi_lib.MaxRowsInList;
+   l_url                        VARCHAR2(32000) := 'ebb_workstations_list';
+   l_row_count                  NUMBER(10) := 0;
+   l_dhtmlx_sort                VARCHAR2(1024);
+   l_module_id                  s004_modules.module_id%TYPE := zsi_lib.GetModuleID(owa_util.get_procedure);
+ 
+   CURSOR ws_mac_cur(lp_ws_id IN NUMBER) IS
+     SELECT * 
+       FROM EBB_WORKSTATION_MAC
+     WHERE ws_id = lp_ws_id;
+
+%>
+<%
+   ebb_pageheader(p_dgrid=>'Y', p_dwin=>'Y');
+%>
+<%
+
+   l_select := 'SELECT ws_id,
+                       ws_name,
+                       ws_group_count ';
+   l_from   := '  FROM ebb_workstations_v ';
+   l_where  := ' WHERE 1=1';
+
+
+
+   IF p_ws_name IS NOT NULL THEN
+      l_where := l_where ||' AND UPPER(ws_name) LIKE '|| '''' || '%' ||  UPPER(p_ws_name) || '%' || '''' || ' ';
+   END IF;
+   l_url := l_url ||'&p_ws_name=' || p_ws_name;
+
+   IF p_page_no = 1 AND p_rows IS NULL THEN
+      l_sql := 'SELECT COUNT(*) ' || l_from || l_where;
+      OPEN wsref FOR l_sql;
+      LOOP
+         FETCH wsref INTO l_rows;
+         EXIT WHEN wsref%NOTFOUND;
+      END LOOP;
+      CLOSE wsref;
+   ELSE
+      l_rows := p_rows;
+   END IF;
+   l_url := l_url ||'&p_rows=' || l_rows;
+
+   l_sql := l_select ||', row_number() OVER (ORDER BY ws_id) rn ' || l_from || l_where;
+
+   l_sql := 'SELECT * FROM ( ' || l_sql || ') ' || zsi_lib.GeneratePagingWhere(p_page_no);
+
+
+
+
+%>
+<body>
+ <%
+   zsi_bs_lib.openModalWindow('modalWindow','Search EBB Workstations','ws_search_frm','ebb_workstations_list');
+   zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Workstation Name',p_inputName=>'p_ws_name', p_labelSize =>3, p_inputSize =>3);
+   zsi_bs_lib.CloseFormGroup();
+
+   zsi_bs_lib.closeModalWindow('submit','Search');
+%>
+
+<table class="dhtmlxGrid" gridWidth="99.5%" gridHeight="500px" id="gridbox1">
+   <tr valign="bottom">
+      <th nowrap align="center" width="50px">ID</th>
+      <th nowrap align="left" width="250px">Workstation Name</th>
+      <th nowrap align="left" width="100px">Mac Address</th>
+      <th nowrap align="left" width="80px">Group(s)</th>
+      <th align="center" width="60px">Delete</th>
+   </tr>
+<%
+   l_dhtmlx_sort := 'str,str,str,na';
+
+   OPEN wsref FOR l_sql;
+   LOOP
+      FETCH wsref INTO l_ws_id,
+                       l_ws_name,
+                       l_ws_group_count,
+                       l_row_no;
+      EXIT WHEN wsref%NOTFOUND;
+      l_row_count := l_row_count + 1;
+%>
+   <tr valign="bottom">
+      <td nowrap align="center"><%=l_ws_id %></td>
+      <td nowrap align="left"><%=l_ws_name %></td>
+      <td nowrap align="left">
+<%
+     FOR i IN ws_mac_cur(l_ws_id) LOOP
+
+        htp.p(i.macaddress || '<br />');
+
+     END LOOP;
+%>
+      </td>
+      <td nowrap align="center">
+         <a href="javascript:void(0)" TITLE="Click here to Add/Edit Workstation Groups" onClick="parent.attachURL('ebb_ws_groups_form?p_ws_id=<%= l_ws_id %>','Add/Edit Workstation Groups', 650, 500)"><%=l_ws_group_count %></a>
+      </td>
+      <td><input type="checkbox" name="p_cb" onclick="zsi.table.setCheckBox(this,<%= l_ws_id %>);">
+                         <input type="hidden" name="p_del_ws" value=""></td>
+   </tr>
+<%
+   END LOOP;
+%>
+</table>
+
+<div class="bottomNav">
+   <div class="buttonGroup">
+   <%
+            zsi_bs_lib.Button('btnSearch','Search',p_data_toggle =>'modal',p_data_target =>'#modalWindow');
+            zsi_bs_lib.Button('btnDelete','Delete',p_onclick =>'return checkDelete(''ebb_workstation_delete?p_del_ws='');');
+   %>
+   </div>
+<% zsi_lib.ShowPaging(p_page_no,l_rows,l_row_count); %>
+</div>
+
+<script type="text/javascript">
+   $(document).ready(function(){
+      $('.modal-dialog').css('width', '450px');
+     
+   });
+
+   //on window resize
+   $(window).resize(function(){
+       zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+   });
+
+  function checkDelete(l_cmd) {
+    var l_stmt, l_count
+      l_stmt = zsi.table.getCheckBoxesValues("input[name=p_cb]:checked","p_del_ws=","&");
+
+    if (l_stmt!="") {
+        if(confirm("Are you sure you want to delete ALL SELECTED Workstations?")) {
+          $.post( l_cmd + "&" + l_stmt, function(d){
+               window.location.reload();
+          }).fail(function(d) {
+                     alert("Sorry, the curent transaction is not successfull.");
+               });
+
+        }
+     }
+   }
+
+   function gotoPage(p_this){
+       var url = "<%= l_url %>&p_page_no=" + p_this.value;
+       window.location.href = url;
+    };
+
+   var mygrid = dhtmlXGridFromTable("gridbox1");
+   mygrid.setSkin("light");
+   mygrid.setImagePath("<%= l_dhtmlx_path %>dhtmlxGrid/codebase/imgs/");
+   mygrid.setEditable(false);
+   mygrid.lockRow(0, true);
+   mygrid.enableLightMouseNavigation(true);
+   mygrid.setColSorting("<%= l_dhtmlx_sort %>");
+   zsi.table.dhtmlx.ResizeGrid(window,mygrid);
+
+</script>
+
+<script type="text/javascript" src="<%= l_js_path %>bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<%@ plsql procedure="ebb_doc_upload_form" %>
+<%@ plsql parameter="p_job_id"   type="NUMBER"%>
+<%!
+/*
+========================================================================
+*
+* Copyright (c) 2014-2015 ZettaSolution, Inc.  All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification is strictly prohibited.
+*
+========================================================================
+*/
+/* Modification History
+   Date       By    History
+   ---------  ----  ---------------------------------------------------------------------
+   03-MAY-15  BD    New
+*/
+--DECLARATION SECTION
+   l_style_path            VARCHAR2(128) := zsi_lib.StylePath;
+   l_title                 VARCHAR2(50);
+   l_job_info              ebb_jobs%ROWTYPE;
+%>
+<%
+   SELECT *
+     INTO l_job_info
+     FROM ebb_jobs
+    WHERE job_id = p_job_id;
+   pageheader;
+%>
+<body>
+<form name="frmDoc" action="ebb_doc_upload" method="POST"  enctype="multipart/form-data">
+<%
+   zsi_bs_lib.InputHiddenBox(p_inputName=>'p_job_id', p_inputValue=>p_job_id);
+
+   zsi_bs_lib.OpenEntryForm;
+
+   zsi_bs_lib.OpenFormGroup();
+%>
+      <label class="col-xs-4 control-label" for="p_file_id">Document/File</label>
+      <div class="col-xs-6">
+         <div class="input-group col-xs-9">
+            <input type="file" name="p_file1" size="80">
+         </div>
+      </div>
+<%
+   zsi_bs_lib.CloseFormGroup();
+
+
+   zsi_bs_lib.OpenFormGroup();
+%>
+      <label class="col-xs-4 control-label" for="p_file_id">Thumbnail</label>
+      <div class="col-xs-6">
+         <div class="input-group col-xs-9">
+            <input type="file" name="p_file2" size="80">
+         </div>
+      </div>
+<%
+   zsi_bs_lib.CloseFormGroup();
+
+   zsi_bs_lib.CloseEntryForm;
+
+%>
+
+<div class="col-xs-12 buttonGroup">
+<%
+      zsi_bs_lib.Offset(2);
+      zsi_bs_lib.Button('btnSubmit','Save',p_type =>'submit');
+      zsi_bs_lib.Button('btnReset','Reset',p_type =>'reset');
+%>
+</div>
+</form>
+
+</body>
+</html>
+
