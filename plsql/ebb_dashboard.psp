@@ -1,0 +1,161 @@
+<%@ plsql procedure="ebb_dashboard" %>
+<%!
+   l_style_path     VARCHAR2(128) := zsi_lib.StylePath;
+   l_js_path        VARCHAR2(128) := zsi_lib.JSPath;
+%>
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>MCWD - eBulletin Board </title>
+
+<link rel="stylesheet" type="text/css" href="bootstrap_css">
+<link rel="stylesheet" type="text/css" href="<%= l_style_path %>bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="<%= l_style_path %>datepicker.css">
+<link rel="stylesheet" type="text/css" href="zsi_style_css">
+<script type="text/javascript" src="/apps/jslib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="/apps/jslib/bootstrap.min.js"></script>
+<script type="text/javascript" src="zsi_lib_js"></script>
+
+</head>
+<body>
+<style>
+#ebb_banner {
+    background: url("/apps/ebb/images/ebb_banner.jpg") no-repeat scroll 0 0 #0278CF;
+    height: 38px;    
+}  
+
+.dashboard-screen {
+    margin-top: 5px;
+}
+
+
+.dashboard-screen .panel-left{
+   float: left;      
+}
+
+.panel-left{
+   overflow:hidden;
+}
+
+
+.panel-left .dbs-l{
+   width: 983px;    
+}
+
+.panel-left .dbs-b{
+   height: 130px; 
+   background-color: #3ba4ef;
+   width: 983px;
+}
+
+
+.dashboard-screen .dbs-r{
+   background-color: #FFF460;
+    float: left;
+    height: 590px;
+    overflow: hidden;
+}
+
+
+.dbs-r ul {
+   margin: 0;
+   padding: 0;
+   list-style-type: none;
+   
+   padding-top: 5px;
+}
+
+
+.dbs-r ul li{
+   margin-top:-5px;   
+}
+
+.dbs-r ul li a{
+   text-align:center;
+   color: #000;
+   text-decoration: none;    
+}
+
+
+.dbs-r ul li a img {
+   border: 2pt solid #fff;   
+}
+
+
+.dbs-r ul li a:hover img {
+   border: 2pt solid #0278CF;  
+}
+
+.dbs-r ul li a:hover {
+   color: #0278CF;  
+}
+
+
+</style>
+<header>
+   <div id="ebb_banner">
+        <div class="container-fluid">
+                  
+        </div>
+        
+        
+    </div>
+</header>
+
+ <div class="container"> 
+
+   <div class="dashboard-screen">  
+         <div class="panel-left col-lg-10 col-md-10 col-sm-10 col-xs-10">
+             <div class="carousel slide dbs-l " id="theCarousel" data-interval="5000">
+               <ol class="carousel-indicators">
+                 <li data-target="#theCarousel" data-slide-to="0" class="active"></li>
+                 <li data-target="#theCarousel" data-slide-to="1"></li>
+                 <li data-target="#theCarousel" data-slide-to="2"></li>
+                 <li data-target="#theCarousel" data-slide-to="3"></li>
+               </ol>
+
+               <div class="carousel-inner">
+                 <div class="item active">
+                   <img src="/apps/ebb/images/data/post1.jpg" alt="1" class="img-responsive"/>
+                 </div>
+                 <div class="item">
+                   <img src="/apps/ebb/images/data/post2.jpg" alt="2" class="img-responsive" />
+                 </div>
+                 <div class="item">
+                   <img src="/apps/ebb/images/data/post3.jpg" alt="3" class="img-responsive"/>           
+                 </div>
+                 <div class="item">
+                   <img src="/apps/ebb/images/data/post4.jpg" alt="4" class="img-responsive" />
+                 </div>
+               </div>
+
+               <a href="#theCarousel" class="carousel-control left" data-slide="prev"><span class="icon-prev"></span></a>
+               <a href="#theCarousel" class="carousel-control right" data-slide="next"><span class="icon-next"></span></a>
+             </div>
+             <div class="dbs-b"></div>
+
+         </div><!--end of panel-left-->
+          
+          <div class="dbs-r col-lg-2 col-md-2 col-sm-2 col-xs-2">
+            <ul>
+               <li><a href="#"><img src="/apps/ebb/images/data/posth1.jpg"  class="img-responsive" /><p>High Priority #1</p></a></li>
+               <li><a href="#"><img src="/apps/ebb/images/data/posth1.jpg"  class="img-responsive" /><p>High Priority #2</p></a></li>
+               <li><a href="#"><img src="/apps/ebb/images/data/posth1.jpg"  class="img-responsive" /><p>High Priority #3</p></a></li>            
+               <li><a href="#"><img src="/apps/ebb/images/data/posth1.jpg"  class="img-responsive" /><p>High Priority #4</p></a></li>            
+               <li><a href="#"><img src="/apps/ebb/images/data/posth1.jpg"  class="img-responsive" /><p>High Priority #5</p></a></li>            
+            </ul>          
+          </div>
+      
+   </div>
+</div>
+
+<script>
+
+   $("#theCarousel").carousel();
+
+</script>
+
+
+</body>
+</html>
