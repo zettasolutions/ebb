@@ -21,6 +21,7 @@ namespace eBulletinBoard
         private WebClient webClient {get;set;}
         private int WS_Id { get; set; }
         private string ServerURL { get { return ConfigurationManager.AppSettings["ServerURL"].ToString(); } }
+        private string DashBoardPage { get { return ConfigurationManager.AppSettings["DashBoardPage"].ToString(); } }
         private string currentRequest{get;set;}
         private bool isDebug { get; set; }
         private bool isClose { get; set; }
@@ -84,15 +85,7 @@ namespace eBulletinBoard
                     switch (m.Code.ToUpper())
                     {
                         case "ALERT":
-                            try
-                            {
-                                process.RunProcess(m.Msg);
-                                this.ProcessRequest("ebb_wsresponse", "p_ws_id=" + WS_Id + "&p_job_id=" + m.Job_Id, true);
-                            }
-                            catch (Exception ex) {
-                                this.ProcessRequest("ebb_wsresponse", "p_ws_id=" + WS_Id + "&p_ws_response=" + ex.Message + "&p_job_id=" + m.Job_Id + "&p_ws_url=" + currentRequest, true);
-                            }
-
+                            new frmBrowser(ServerURL + DashBoardPage).Show();
                             break;
 
                         case "DEBUG":
