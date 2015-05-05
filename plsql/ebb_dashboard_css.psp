@@ -1,0 +1,153 @@
+<% owa_util.mime_header('text/css');%>
+<%@ plsql procedure="ebb_dashboard_css" %>
+<%!%>
+
+body{
+   background-color:#e8e6e6;   
+}
+
+a,a:active,a:hover{
+   text-decoration: none;
+}
+a{color : #fff;}
+a:hover{color : #0278CF;}
+
+#ebb_banner {
+    background: url("/apps/ebb/images/ebb_banner.jpg") no-repeat scroll 0 0 #0278CF;
+    height: 38px;    
+}  
+
+.dashboard-screen {
+    margin-top: 20px;
+}
+
+
+.dashboard-screen .panel-left{
+   float: left;      
+}
+
+.panel-left{
+   overflow:hidden;
+}
+
+
+.panel-left .dbs-l{}
+
+
+.dashboard-screen .dbs-r{
+   background-color: #3BA4EF;
+    float: left;
+    height: 447px;
+    overflow: hidden;
+}
+
+
+.dbs-r ul {
+   margin: 0;
+   padding: 0;
+   list-style-type: none;
+   
+   padding-top: 5px;
+}
+
+
+.dbs-r ul li{
+   margin-top:-5px;   
+}
+
+.dbs-r ul li:first-child{
+   margin-top:1px;   
+}
+
+
+.dashboard-screen ul li a{
+   text-align:center;
+   color: #000;
+   text-decoration: none;    
+}
+
+
+.dashboard-screen ul li a img {
+   border: 1pt solid #fff;   
+}
+
+
+.dashboard-screen ul li a:hover img {
+   border: 1pt solid #F9D400;  
+}
+
+.dashboard-screen ul li a:hover {
+   color: #fff;
+}
+
+
+
+.panel-left .dbs-b{
+   height: 104px; 
+   background-color: #3ba4ef;
+   padding:0;
+   margin:0;
+}
+
+.dbs-b-content ul
+{
+   margin: 0;
+   padding: 0;
+   list-style-type: none;
+}
+
+.dbs-b-content ul li { 
+    float: left;
+    margin-left: 5px;
+    margin-top: 5px;
+    width: 172px;
+}
+ 
+ 
+
+.dbs-b-left a{   
+   background-color: #0278CF;
+   float: left;
+   height: 100%;
+   width: 25px;
+   text-align: center;   
+   line-height: 10;   
+}
+
+.dbs-b-right a{
+    background-color: #0278CF;
+    height: 100%;
+    line-height: 10;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    width: 25px
+}
+
+
+.dbs-b a:hover{
+   background-color:#9A9C9E;   
+}
+
+
+/* Carousel Header Styles */
+.header-text {
+    float: left;
+    margin-top: -44px;    
+    color: #fff;    
+    width: 99%;
+    
+}
+.header-text h3{
+   text-align:center;
+}
+.header-text h3 span {
+   background-color: #0B151E;
+   padding-top:5px;
+   padding-bottom:5px;
+   padding-left:25px;
+   padding-right:25px;   
+   font-size:12pt;
+}
+
+ 
