@@ -19,14 +19,14 @@
 
 </head>
 <body>
- 
 <header>
-   <div id="ebb_banner">
-        <div class="container-fluid">                  
-        </div>
+    <div id="ebb_banner">
+       <div class="container">
+         <div class="header-bg"></div> 
+         <h1>MCWD - eBulletin Board</h1>
+       </div>
    </div>
-</header>
-
+ </header>
  <div class="container"> 
    <div class="dashboard-screen">  
          <div class="panel-left col-lg-10 col-md-10 col-sm-10 col-xs-10">

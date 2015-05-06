@@ -17,17 +17,33 @@ a{color : #fff;}
 a:hover{color : #0278CF;}
 
 #ebb_banner {
-    background: url("/apps/ebb/images/ebb_banner.jpg") no-repeat scroll 0 0 #0278CF;
+    background-color: #0278CF;
     height: 38px;    
-}  
+}
+
+.header-bg{
+   background: url("/apps/ebb/images/header-bg.png") no-repeat scroll 0 0;   
+   height: 39px;
+   margin-left: -160px;
+   position: absolute;
+   width: 572px;
+}
+
+#ebb_banner h1 {
+   font-size: 21px;
+   line-height: 0.2;
+   margin-left: 4px;
+   position: absolute;
+}
 
 
 #theCarousel{
    height:424px;   
+   background-color:#FFFEE2;
 }
 
 .dashboard-screen {
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 
@@ -144,7 +160,7 @@ a:hover{color : #0278CF;}
 
 
 .dbs-b a:hover{
-   background-color:#9A9C9E;   
+   background-color:#d3d3d3;   
 }
 
 
