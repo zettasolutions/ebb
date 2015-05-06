@@ -77,12 +77,17 @@ function getPost(){
             var _index = $(data.rows).index($(this));
 
             htop +='<div class="item ' + (_index==0? 'active' : '') + '">';
-                htop +='<img src="' + this.row[0] + '" alt="1" class="img-responsive"/>'
+                htop +='<img src="' + this.row[0] + '" alt="1" class=""/>'
                   htop +='<div class="header-text ">';
                      htop +='<div class="col-md-12 ">';
                         htop +='<h3><span><a href="#">' + this.row[1] + '</a></span></h3>';
                      htop +='</div>';
                   htop +='</div>';
+                  htop +='<div class="header-desc ">';
+                     htop +='<div class="col-md-12 ">';
+                        htop +='<h2><span><a href="#">' + this.row[2] + '</a></span></h2>';
+                     htop +='</div>';
+                  htop +='</div>';                  
             htop +='</div>';
 
             hbutton +='<li><a href="#"><img src="' + this.row[0] + '"  class="img-responsive" data-target="#theCarousel" data-slide-to="' + _index + '" /><p>' + this.row[1] + '</p></a></li>';
@@ -90,8 +95,8 @@ function getPost(){
 
             $('.carousel-inner').append(htop);
 
-            //is highpriority = 2
-            if (this.row[2]==false) 
+            //is highpriority = 3
+            if (this.row[3]==false) 
                   $('.dbs-b-content ul').append(hbutton);
             else
                   $('.dbs-r ul').append(hbutton);
