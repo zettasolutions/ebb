@@ -52,13 +52,16 @@
 
 <script>
 
- var urlPost = 'ebb_get_posttest_json';
- var slide = $("#theCarousel");
+ var urlPost    = 'ebb_get_posttest_json';
+ var slide      = $("#theCarousel");
  var ulButtonsB = $(".dbs-b-content ul");
  var ulButtonsR = $(".dbs-r ul");
- var aGoRight = $(".dbs-b-right a");
- var aGoLeft = $(".dbs-b-left a");
-
+ var aGoRight   = $(".dbs-b-right a");
+ var aGoLeft    = $(".dbs-b-left a");
+ var cssML      = "margin-left";
+ var initMargin = 25;
+ var liWidth    = 177;
+ var limitWidth = 935;
 
 slide.bind('slide.bs.carousel', function (e) {
    var i = $(e.relatedTarget).index();
@@ -72,21 +75,28 @@ slide.bind('slide.bs.carousel', function (e) {
       $(liR[i]).addClass("active");
    }
    else{
-      var li = $(liB[i - (liR.length) ]);
-      var offsetL = li.offset().left;
-      if(offsetL < 0) ulButtonsB.animate({ "margin-left": "0px" });           
-      if(offsetL  > 900) aGoRight.click();          
+      var currIndex = i - liR.length; 
+      var li = $(liB[currIndex]);
+      var marginL = parseInt(ulButtonsB.css(cssML)) ;
+      
+      //get total LeftMargin
+      var totalLM = ((currIndex+1) * liWidth)  + ( 5 * (currIndex+1) ) + marginL;  
+      //console.log("totalLM > limitWidth: " + totalLM  + " : " + limitWidth);
+      if(currIndex==0) 
+         ulButtonsB.animate({ "margin-left": initMargin + "px" });    
+      else 
+         if(totalLM  > limitWidth) aGoRight.click();         
       li.addClass("active");
    }      
 });
 
 aGoRight.click(function(){
-   ulButtonsB.animate({ "margin-left": "-=177px" });
+   ulButtonsB.animate({ "margin-left": "-=" + liWidth + "px" });
 });
 
 
 aGoLeft.click(function(){
-   if(parseInt(ulButtonsB.css("margin-left")) <0 ) ulButtonsB.animate({ "margin-left": "+=177px" });
+   if(parseInt(ulButtonsB.css(cssML)) <0 ) ulButtonsB.animate({ "margin-left": "+=" + liWidth + "px" });
 });
 
 

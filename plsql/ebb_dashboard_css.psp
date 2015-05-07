@@ -128,10 +128,11 @@ a:hover{color : #0278CF;}
    background-color: #3ba4ef;
    padding:0;
    margin:0;
+   overflow: hidden;
+
 }
 .dbs-b-content{
     height: 111px;
-    overflow: hidden;
     width: 888px;    
 }
 
@@ -143,6 +144,9 @@ a:hover{color : #0278CF;}
    width: 2000px;
 }
 
+.dbs-b-content ul {
+    margin-left:25px;
+}
 .dbs-b-content ul li { 
     float: left;
     margin-left: 5px;
@@ -150,11 +154,10 @@ a:hover{color : #0278CF;}
     width: 172px;
     height:106px;
 }
- 
 
 .dbs-b-left a{   
    background-color: #0278CF;
-   float: left;
+   position: absolute;
    height: 100%;
    width: 25px;
    text-align: center;   
