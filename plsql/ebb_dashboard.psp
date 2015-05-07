@@ -54,13 +54,41 @@
 
  var urlPost = 'ebb_get_posttest_json';
  var slide = $("#theCarousel");
+ var ulButtonsB = $(".dbs-b-content ul");
+ var ulButtonsR = $(".dbs-r ul");
+ var aGoRight = $(".dbs-b-right a");
+ var aGoLeft = $(".dbs-b-left a");
 
 
 slide.bind('slide.bs.carousel', function (e) {
    var i = $(e.relatedTarget).index();
+   
+   liR = ulButtonsR.children();    
+   liB = ulButtonsB.children(); 
+   
+   $(".dbs-r ul li").removeClass("active");
+   $(".dbs-b-content ul li").removeClass("active");
+   if(i < liR.length){   
+      $(liR[i]).addClass("active");
+   }
+   else{
+      var li = $(liB[i - (liR.length) ]);
+      var offsetL = li.offset().left;
+      //847.5      
+      if(offsetL < 0) ulButtonsB.animate({ "margin-left": "0px" });           
+      if(offsetL  > 850) aGoRight.click();          
+      li.addClass("active");
+   }      
+});
+
+aGoRight.click(function(){
+   ulButtonsB.animate({ "margin-left": "-=177px" });
 });
 
 
+aGoLeft.click(function(){
+   if(parseInt(ulButtonsB.css("margin-left")) <0 ) ulButtonsB.animate({ "margin-left": "+=177px" });
+});
 
 
 $(document).ready(function(){    
@@ -90,7 +118,7 @@ function getPost(){
                   htop +='</div>';                  
             htop +='</div>';
 
-            hbutton +='<li><a href="#"><img src="' + this.row[0] + '"  class="img-responsive" data-target="#theCarousel" data-slide-to="' + _index + '" /><p>' + this.row[1] + '</p></a></li>';
+            hbutton +='<li ' + (_index==0? 'class="active"' : '') + '><a href="#"><img src="' + this.row[0] + '"  class="img-responsive" data-target="#theCarousel" data-slide-to="' + _index + '" /><p>' + this.row[1] + '</p></a></li>';
 
 
             $('.carousel-inner').append(htop);
