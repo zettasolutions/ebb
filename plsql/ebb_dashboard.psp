@@ -74,9 +74,8 @@ slide.bind('slide.bs.carousel', function (e) {
    else{
       var li = $(liB[i - (liR.length) ]);
       var offsetL = li.offset().left;
-      //847.5      
       if(offsetL < 0) ulButtonsB.animate({ "margin-left": "0px" });           
-      if(offsetL  > 850) aGoRight.click();          
+      if(offsetL  > 900) aGoRight.click();          
       li.addClass("active");
    }      
 });
