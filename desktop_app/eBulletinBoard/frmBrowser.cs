@@ -51,7 +51,7 @@ namespace eBulletinBoard
 
         private void frmBrowser_Load(object sender, EventArgs e)
         {
-            if (isLocalDebug == false) this.TopMost = true;
+            this.TopMost = true;
         }
 
         private void btnClose_Click(object sender, EventArgs e)

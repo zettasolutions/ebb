@@ -68,6 +68,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmBrowser";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Flash Message";
             this.Load += new System.EventHandler(this.frmBrowser_Load);
