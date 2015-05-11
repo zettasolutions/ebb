@@ -52,7 +52,7 @@
 
 <script>
 
- var urlPost    = 'ebb_get_posttest_json';
+ var urlPost    = 'ebb_get_post_json';
  var slide      = $("#theCarousel");
  var ulButtonsB = $(".dbs-b-content ul");
  var ulButtonsR = $(".dbs-r ul");

@@ -1,6 +1,6 @@
 SET SCAN OFF
 CREATE OR REPLACE 
-PROCEDURE ebb_get_posttest_json 
+PROCEDURE ebb_get_post_json 
 (
   p_rows         IN NUMBER default NULL,
   p_page_no      IN NUMBER default 1,
