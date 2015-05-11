@@ -112,7 +112,7 @@
       <th align="center" width="60px">Delete</th>
    </tr>
 <%
-   l_dhtmlx_sort := 'int,str,str,str,int,na';
+   l_dhtmlx_sort := 'str,date,str,str,str,int,na,na';
 
    OPEN jobref FOR l_sql;
    LOOP
@@ -129,7 +129,7 @@
 %>
    <tr valign="bottom">
       <td nowrap align="center">
-         <a href="javascript:void(0)" TITLE="Click here to Edit Job" onClick="parent.attachURL('ebb_jobs_form?p_job_id=<%= l_job_id %>','Edit Job &raquo <%=l_job_id %>', 900, 550)"><%=l_job_id %></a>
+         <a id="<%= LPAD(l_job_id,10,'0') %>" href="javascript:void(0)" TITLE="Click here to Edit Job" onClick="parent.attachURL('ebb_jobs_form?p_job_id=<%= l_job_id %>','Edit Job &raquo <%=l_job_id %>', 900, 550)"><%=l_job_id %></a>
       </td>
       <td nowrap align="center"><%= TO_CHAR(l_job_date,l_date_format) %></td>
       <td nowrap align="left"><%=l_job_desc %></td>
@@ -158,6 +158,7 @@
 
 <script type="text/javascript">
    $(document).ready(function(){
+      parent.HomeWindow=window;
       $('.modal-dialog').css('width', '450px');
    });
 
@@ -192,6 +193,7 @@
    mygrid.setImagePath("<%= l_dhtmlx_path %>dhtmlxGrid/codebase/imgs/");
    mygrid.setEditable(false);
    mygrid.lockRow(0, true);
+   mygrid.setDateFormat("%m-%d-%Y");
    mygrid.enableLightMouseNavigation(true);
    mygrid.setColSorting("<%= l_dhtmlx_sort %>");
    zsi.table.dhtmlx.ResizeGrid(window,mygrid);

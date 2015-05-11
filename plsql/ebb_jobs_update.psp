@@ -54,7 +54,9 @@ BEGIN
    l_seq := p_job_id;
    l_job_date := TO_DATE(p_job_date,l_date_format);
 
-   IF p_job_id IS NULL  AND p_job_date IS NOT NULL  AND p_doc_filename IS NOT NULL AND p_thumb_filename IS NOT NULL THEN
+   IF p_job_id IS NULL  AND p_job_date IS NOT NULL
+        AND (p_doc_filename IS NOT NULL OR p_old_doc IS NOT NULL)
+        AND (p_thumb_filename IS NOT NULL OR p_old_thumb IS NOT NULL) THEN
       SELECT ebb_jobs_SQ001.NEXTVAL INTO l_seq FROM DUAL;
       INSERT INTO ebb_jobs (
           job_id
@@ -74,7 +76,9 @@ BEGIN
          ,p_doc_filename
          ,p_thumb_filename
    );
-   ELSIF p_job_id IS NOT NULL AND p_job_date IS NOT NULL  AND p_doc_filename IS NOT NULL AND p_thumb_filename IS NOT NULL THEN
+   ELSIF p_job_id IS NOT NULL AND p_job_date IS NOT NULL
+        AND (p_doc_filename IS NOT NULL OR p_old_doc IS NOT NULL)
+        AND (p_thumb_filename IS NOT NULL OR p_old_thumb IS NOT NULL) THEN
 
       SELECT * INTO l_rec FROM ebb_jobs WHERE job_id=p_job_id;
 
@@ -148,6 +152,6 @@ END;
 %>
 
 <script type="text/javascript">
-    parent.location.reload();
-    parent.w1.close();
+   parent.HomeWindow.location.reload();
+   parent.w1.close();
 </script>

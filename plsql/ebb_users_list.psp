@@ -153,8 +153,10 @@
    <div class="buttonGroup">
 <%
          zsi_bs_lib.Button('btnSearch','Search',p_data_toggle =>'modal',p_data_target =>'#modalWindow');
+/*
          zsi_bs_lib.Button('btnAdd','Add',p_onclick =>'parent.attachURL(''ebb_jobs_form?p_job_id='',''Add Job'', 900, 550)');
          zsi_bs_lib.Button('btnDelete','Delete',p_onclick =>'return checkDelete(''ebb_jobs_delete?p_del_jobs='');');
+*/
 %>
    </div>
 <%
