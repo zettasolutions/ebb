@@ -60,7 +60,7 @@ namespace eBulletinBoard
 
         public void GetSignalData()
         {
-          this.ProcessRequest("ebb_getjob", "p_ws_id=" + WS_Id,true);
+          this.ProcessRequest("ebb_getjob", "p_ws_id=" + WS_Id + "&p_rt=" +  Guid.NewGuid(),true);
 
         }
 
@@ -96,7 +96,7 @@ namespace eBulletinBoard
 
                                 if (this.isReading == false){
                                     this.isReading = true;
-                                    string url =ServerURL + flashMsgUrl + "?p_rt=" +  Guid.NewGuid();
+                                    string url =ServerURL + flashMsgUrl + "?p_ws_id=" + WS_Id + "&p_rt=" +  Guid.NewGuid();
                                     frmBrowser frm = new frmBrowser(this,url);
                                     frm.Show();
                                 }
