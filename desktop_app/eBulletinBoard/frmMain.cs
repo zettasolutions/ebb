@@ -21,7 +21,10 @@ namespace eBulletinBoard
         private WebClient webClient {get;set;}
         private int WS_Id { get; set; }
         private string ServerURL { get { return ConfigurationManager.AppSettings["ServerURL"].ToString(); } }
-        private string DashBoardPage { get { return ConfigurationManager.AppSettings["DashBoardPage"].ToString(); } }
+        private string flashMsgUrl { get { return ConfigurationManager.AppSettings["flashMsgUrl"].ToString(); } }
+        private Boolean isLocalDebug { get { return Convert.ToBoolean(ConfigurationManager.AppSettings["isLocalDebug"].ToString()); } }
+        private frmBrowser browser { get; set; }
+        public bool isReading { get; set; }
         private string currentRequest{get;set;}
         private bool isDebug { get; set; }
         private bool isClose { get; set; }
@@ -32,11 +35,13 @@ namespace eBulletinBoard
         }
         private void frmMain_Load(object sender, EventArgs e)
         {
-            
+
             process = new Process();
             webClient = new WebClient();
             webClient.OpenReadCompleted += new OpenReadCompletedEventHandler(OpenReadCompleted);
             this.ProcessRequest("ebb_register", "p_ws_name=" + System.Environment.MachineName + "&p_macadd=" + Util.GetMacAddress(),true);
+            if (isLocalDebug) isDebug = true;
+ 
         }
 
 
@@ -85,11 +90,21 @@ namespace eBulletinBoard
                     switch (m.Code.ToUpper())
                     {
                         case "ALERT":
-                            new frmBrowser(ServerURL + DashBoardPage).Show();
+
+                            bool isNewPost = Convert.ToBoolean(m.value);
+                            if (isNewPost){
+
+                                if (this.isReading == false){
+                                    this.isReading = true;
+                                    string url =ServerURL + flashMsgUrl + "?p_rt=" +  Guid.NewGuid();
+                                    frmBrowser frm = new frmBrowser(this,url);
+                                    frm.Show();
+                                }
+                            }
                             break;
 
                         case "DEBUG":
-                            if (m.Msg.ToUpper() == "TRUE")
+                            if (m.value.ToUpper() == "TRUE")
                             {
                                 this.WindowState = FormWindowState.Normal;
                                 this.Visible = true;
@@ -102,16 +117,16 @@ namespace eBulletinBoard
                                 isDebug = false;
                             }
 
-                            this.ProcessRequest("ebb_wsresponse", "p_ws_id=" + WS_Id + "&p_job_id=" + m.Job_Id, true);
+                            //this.ProcessRequest("ebb_wsresponse", "p_ws_id=" + WS_Id + "&p_job_id=" + m.Job_Id, true);
                             
                             break;
 
-                        case "WSID": WS_Id = Convert.ToInt32(m.Msg);
+                        case "WSID": WS_Id = Convert.ToInt32(m.value);
                             break;
 
                         case "CLOSEAPP":
                             this.isClose = true;
-                            this.ProcessRequest("ebb_wsresponse", "p_ws_id=" + WS_Id + "&p_job_id=" + m.Job_Id, true);
+                            //this.ProcessRequest("ebb_wsresponse", "p_ws_id=" + WS_Id + "&p_job_id=" + m.Job_Id, true);
                             System.Threading.Thread.Sleep(1000);
                             this.Close();
                             break;

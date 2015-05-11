@@ -17,7 +17,7 @@ namespace eBulletinBoard
 
             if (data.ToLower().Contains("http"))
             {
-                new frmBrowser(data).Show();
+             //   new frmBrowser(data).Show();
             }
             else
             {

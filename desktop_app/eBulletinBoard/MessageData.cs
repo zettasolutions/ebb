@@ -9,7 +9,7 @@ namespace eBulletinBoard
     public class MessageData
     {
         public string Code { get; set; }
-        public string Job_Id { get; set; }
-        public string Msg { get; set; }
+        //public string Job_Id { get; set; }
+        public string value { get; set; }
     }
 }

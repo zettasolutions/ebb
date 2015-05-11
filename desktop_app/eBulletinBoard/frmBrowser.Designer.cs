@@ -29,45 +29,56 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.wb = new System.Windows.Forms.WebBrowser();
             this.tmr = new System.Windows.Forms.Timer(this.components);
+            this.wb = new System.Windows.Forms.WebBrowser();
+            this.btnClose = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // wb
-            // 
-            this.wb.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.wb.Location = new System.Drawing.Point(0, 0);
-            this.wb.MinimumSize = new System.Drawing.Size(20, 20);
-            this.wb.Name = "wb";
-            this.wb.Size = new System.Drawing.Size(663, 432);
-            this.wb.TabIndex = 0;
-            this.wb.Navigated += new System.Windows.Forms.WebBrowserNavigatedEventHandler(this.wb_Navigated);
             // 
             // tmr
             // 
             this.tmr.Interval = 10000;
             this.tmr.Tick += new System.EventHandler(this.tmr_Tick);
             // 
+            // wb
+            // 
+            this.wb.Location = new System.Drawing.Point(18, 12);
+            this.wb.MinimumSize = new System.Drawing.Size(20, 20);
+            this.wb.Name = "wb";
+            this.wb.Size = new System.Drawing.Size(977, 384);
+            this.wb.TabIndex = 2;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(920, 402);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 3;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
             // frmBrowser
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(663, 432);
+            this.ClientSize = new System.Drawing.Size(1007, 431);
             this.ControlBox = false;
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.wb);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "frmBrowser";
-            this.Text = "Bulletin Update";
-            this.TopMost = true;
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.Text = "Flash Message";
+            this.Load += new System.EventHandler(this.frmBrowser_Load);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.WebBrowser wb;
         private System.Windows.Forms.Timer tmr;
+        private System.Windows.Forms.WebBrowser wb;
+        private System.Windows.Forms.Button btnClose;
     }
 }
