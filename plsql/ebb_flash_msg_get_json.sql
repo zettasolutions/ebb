@@ -31,7 +31,7 @@ IS
 BEGIN
    owa_util.mime_header('application/json'); 
 
-   htp.p('{"msg":"You can use all Bootstrap plugins purely through the markup API without writing a single line of JavaScript. This is Bootstrap''s first-class API and should be your first consideration when using a plugin"}'); 
+   htp.p('{"value":"You can use all Bootstrap plugins purely through the markup API without writing a single line of JavaScript. This is Bootstrap''s first-class API and should be your first consideration when using a plugin"}'); 
 
 END;
 /
