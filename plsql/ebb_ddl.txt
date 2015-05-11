@@ -103,3 +103,6 @@ VALUES (ebb_users_seq.nextval,'GFUENTES',ORA_HASH('ebbAdmin'),'Fuentes','German'
 /
 COMMIT
 /
+
+
+
