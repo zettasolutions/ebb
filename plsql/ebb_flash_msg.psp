@@ -1,0 +1,60 @@
+<%@ plsql procedure="ebb_flash_msg" %>
+<%!
+   l_style_path     VARCHAR2(128) := zsi_lib.StylePath;
+   l_js_path        VARCHAR2(128) := zsi_lib.JSPath;
+%>
+
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>MCWD - eBulletin Board </title>
+
+<link rel="stylesheet" type="text/css" href="bootstrap_css">
+<link rel="stylesheet" type="text/css" href="<%= l_style_path %>bootstrap-theme.min.css">
+<link rel="stylesheet" type="text/css" href="<%= l_style_path %>datepicker.css">
+<link rel="stylesheet" type="text/css" href="ebb_dashboard_css">
+<script type="text/javascript" src="/apps/jslib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="/apps/jslib/bootstrap.min.js"></script>
+<script type="text/javascript" src="zsi_lib_js"></script>
+
+</head>
+<body>
+<header>
+    <div id="ebb_banner">
+       <div class="container">
+         <div class="header-bg"></div> 
+         <h1>MCWD - eFlash Message</h1>
+       </div>
+   </div>
+ </header>
+ <div class="container"> 
+   <div class="flash-screen">  
+       
+      
+   </div>
+</div>
+
+<script>
+
+ var urlPost    = 'ebb_flash_msg_get_json';
+
+
+$(document).ready(function(){    
+   getPost();   
+    
+});
+
+    
+function getPost(){
+   $.getJSON(urlPost, function(data){      
+      
+      $(".flash-screen").html(data.msg);
+      
+   });
+   
+} 
+
+
+</script>
+</body>
+</html>
