@@ -53,7 +53,7 @@ BEGIN
            
   END IF;
   
-  htp.p('{ "Code":"WSID", "Msg":"' || l_ws_id || '" }');
+  htp.p('{ "Code":"WSID", "value":"' || l_ws_id || '" }');
    
  
 END;

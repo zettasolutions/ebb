@@ -1,22 +1,9 @@
 SET SCAN OFF
 CREATE OR REPLACE
-PROCEDURE ebb_getjob (p_ws_id          IN VARCHAR2 default NULL) IS
-/*
-========================================================================
-*
-* Copyright (c) 2014 ZettaSolution, Inc.  All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification is strictly prohibited.
-*
-========================================================================
-*/
-/* Modification History
-   Date       By    History
-   ---------  ----  ---------------------------------------------------------------------
-   03-AUG-14  GT    New
-*/
-   --DECLARATION SECTION
+PROCEDURE ebb_getjob (
+   p_ws_id       IN VARCHAR2 default NULL
+  ,p_rt          IN VARCHAR2 default NULL
+) IS
    l_ws_id    NUMBER;
 
    l_job_id    NUMBER;

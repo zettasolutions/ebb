@@ -1,5 +1,6 @@
 <%@ plsql procedure="ebb_flash_msg" %>
-<%@ plsql parameter="p_rt" type="VARCHAR2"   default="NULL"%>
+<%@ plsql parameter="p_ws_id"   type="NUMBER"    default="NULL"%>
+<%@ plsql parameter="p_rt"      type="VARCHAR2"  default="NULL"%>
 <%!
    l_style_path     VARCHAR2(128) := zsi_lib.StylePath;
    l_js_path        VARCHAR2(128) := zsi_lib.JSPath;
