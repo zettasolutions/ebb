@@ -10,7 +10,6 @@
 <html lang="en-US">
 <head>
 <title>MCWD - eBulletin Board </title>
-
 <link rel="stylesheet" type="text/css" href="bootstrap_css">
 <link rel="stylesheet" type="text/css" href="<%= l_style_path %>bootstrap-theme.min.css">
 <link rel="stylesheet" type="text/css" href="<%= l_style_path %>datepicker.css">
@@ -29,7 +28,7 @@
 
 <script>
 
- var urlPost    = 'ebb_flash_msg_get_json';
+ var urlPost    = 'ebb_flash_msg_get_json?p_ws_id=<%=p_ws_id%>&p_rt=<%=p_rt%>';
 
 
 $(document).ready(function(){    

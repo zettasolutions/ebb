@@ -13,7 +13,7 @@ PROCEDURE ebb_getjob (
 
 BEGIN
 
-     htp.p('{"code":"alert","value":true}');
+     htp.p('{"code":"alert","value":false}');
 END;
 /
 SHOW ERR;

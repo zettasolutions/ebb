@@ -2,7 +2,7 @@ SET SCAN OFF
 CREATE OR REPLACE 
 PROCEDURE ebb_flash_msg_get_json 
 (
-  p_wsid         IN NUMBER default NULL,
+  p_ws_id         IN NUMBER default NULL,
   p_rt           IN VARCHAR2 default NULL
 ) 
 
