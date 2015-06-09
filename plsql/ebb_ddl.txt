@@ -30,7 +30,7 @@ FIRST_NAME               VARCHAR2(30)  NOT NULL,
 MIDDLE_INI               VARCHAR2(1),
 PWD                      VARCHAR2(30),
 SESSION_ID               NUMBER(10),
-ADMIN                    VARCHAR2(1)   DEFAULT 'N', /* THE ONLY ONE WHO CAN ADD USER */
+USER_ROLE                NUMBER(1) DEFAULT 3, --1=ADMIN,2=APPROVER,3=ORDINARY USER
 ACTIVE                   VARCHAR2(1)   DEFAULT 'Y',
 CREATED_BY               NUMBER(10),
 CREATED_DATE             DATE,

@@ -38,9 +38,6 @@
    l_job_seq            ebb_jobs.job_seq%TYPE := '';
    l_action             ebb_jobs.action%TYPE:= '';
    l_user_iswrite       NUMBER(1):=0;
-   l_selected1          VARCHAR2(20);
-   l_selected2          VARCHAR2(20);
-   l_selected3          VARCHAR2(20);
 
    CURSOR um_cur IS
       SELECT *
@@ -54,6 +51,16 @@
        WHERE group_id NOT IN (SELECT group_id FROM ebb_job_groups_v WHERE job_id = p_job_id)
        ORDER BY group_name asc;
 
+
+   FUNCTION Selected (p_value IN VARCHAR2,
+                      p_option_value IN VARCHAR2) RETURN VARCHAR2 IS
+   BEGIN
+      IF p_value = p_option_value THEN
+         RETURN 'SELECTED';
+      END IF;
+      RETURN NULL;
+   END;
+
 %>
 <%
    IF p_job_id IS NOT NULL THEN
@@ -66,20 +73,6 @@
       l_job_seq              :=l_rec.job_seq;
       l_action               :=l_rec.action;
    END IF;
-
-   l_selected1 := '';
-   l_selected2 := '';
-   l_selected3 := '';
-
-   IF l_action = 'ALERT' THEN
-      l_selected1 := 'SELECTED';
-   ELSIF l_action = 'DEBUG' THEN
-      l_selected2 := 'SELECTED';
-   ELSIF l_action = 'CLOSEAPP' THEN
-      l_selected3 := 'SELECTED';
-   END IF;
-
-
 %>
 <%
    ebb_header(p_dgrid=>'Y', p_dwin=>'Y');
@@ -93,6 +86,11 @@
    zsi_bs_lib.OpenFormGroup();
       zsi_bs_lib.InputTextBox(p_labelName =>'Job Date',p_inputName=>'p_job_date',p_inputValue=>l_job_date,p_labelSize =>2, p_inputSize =>1, p_attributes=>'style="width: 110px;"');
    zsi_bs_lib.CloseFormGroup();
+
+   zsi_bs_lib.OpenFormGroup();
+      zsi_bs_lib.InputTextBox(p_labelName =>'Title',p_inputName=>'p_title',p_inputValue=>l_title, p_labelSize =>2, p_inputSize =>8);
+   zsi_bs_lib.CloseFormGroup();
+
    zsi_bs_lib.OpenFormGroup();
       zsi_bs_lib.InputTextBox(p_labelName =>'Description',p_inputName=>'p_job_desc',p_inputValue=>l_job_desc, p_labelSize =>2, p_inputSize =>8);
    zsi_bs_lib.CloseFormGroup();
@@ -137,16 +135,29 @@
    zsi_bs_lib.CloseFormGroup();
    zsi_bs_lib.OpenFormGroup();
 %> <label class="col-xs-2 control-label">Action </label>
-<div class="col-xs-2">
-          <SELECT name="p_action" value="" class="form-control input-sm">
-            <OPTION value="ALERT" <%= l_selected1 %>>ALERT</OPTION>
-            <OPTION value="DEBUG" <%= l_selected2 %>>DEBUG</OPTION>
-            <OPTION value="CLOSEAPP" <%= l_selected3 %>>CLOSE APP</OPTION>
-
-          </SELECT>
-</div>
+      <div class="col-xs-2">
+                <SELECT name="p_action" value="" class="form-control input-sm">
+                  <OPTION value="ALERT" <%= Selected(l_rec.action,'ALERT') %>>Alert</OPTION>
+                  <OPTION value="BULLETIN" <%= Selected(l_rec.action,'BULLETIN') %>>Bulletin</OPTION>
+                </SELECT>
+      </div>
 <%
    zsi_bs_lib.CloseFormGroup();
+
+   zsi_bs_lib.OpenFormGroup();
+%> <label class="col-xs-2 control-label">Priority No </label>
+      <div class="col-xs-2">
+                <SELECT name="p_action" value="" class="form-control input-sm">
+                  <OPTION value="1" <%= Selected(l_rec.priority_no,1) %>>1</OPTION>
+                  <OPTION value="2" <%= Selected(l_rec.priority_no,2) %>>2</OPTION>
+                  <OPTION value="3" <%= Selected(l_rec.priority_no,3) %>>3</OPTION>
+                  <OPTION value="4" <%= Selected(l_rec.priority_no,4) %>>4</OPTION>
+                  <OPTION value="5" <%= Selected(l_rec.priority_no,5) %>>5</OPTION>
+                </SELECT>
+      </div>
+<%
+   zsi_bs_lib.CloseFormGroup();
+
    zsi_bs_lib.OpenFormGroup();
 %>
 
